@@ -48,7 +48,7 @@ const ProfilePage = () => {
         { headers: authHeader() }
       )
       .then((response) => {
-        console.log(response.data);
+        // console.log(response.data);
         localStorage.clear();
         dispatch(logOut());
       });
