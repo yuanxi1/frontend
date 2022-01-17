@@ -4,7 +4,7 @@ import { useAppSelector, useAppDispatch } from "../app/hooks";
 import authHeader from "../api/auth-header";
 import axios from "axios";
 import { Tag } from "../reducers/tagSlice";
-import { Typography } from "@mui/material";
+import Typography from "@mui/material/Typography";
 import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
@@ -16,6 +16,7 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Fab from "@mui/material/Fab";
+
 
 const ManageTags = () => {
   const dispatch = useAppDispatch();
