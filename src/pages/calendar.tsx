@@ -16,7 +16,7 @@ import {
     selectAllTasks,
     Task,
   } from "../reducers/taskSlice";
-import { withStyles } from "@mui/material";
+
   const styledCalendar = styled(Calendar)({
     marginTop: '7%',
 //         marginLeft: '15%',
