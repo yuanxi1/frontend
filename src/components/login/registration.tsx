@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-
+import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 
 const Registration = (props: { handleLogin: (arg0: any) => void; }) => {
     const [email, setEmail] = useState('')
@@ -27,41 +31,65 @@ const Registration = (props: { handleLogin: (arg0: any) => void; }) => {
     }
 
     return (
-    <div>
-        <div className="form">
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            
-            placeholder="Confirm Password"
-            value={password_confirmation}
-            onChange={e => setPassword_confirmation(e.target.value)}
-            required
-          />
+      <Paper sx={{ padding: 3, borderRadius: 5, width: "80%", margin: "auto" }}>
+      <Typography>Log In</Typography>
 
-          <button type="submit">Register</button>
-        </form>
+      <Stack
+        spacing={2}
+        sx={{
+          padding: 3,
+          border: "1px solid #B39DDB",
+          borderRadius: 5,
+          margin: "auto",
+        }}
+      >
+        <TextField
+          fullWidth
+          id="outlined-basic"
+          label="Email"
+          type="email"
+          variant="outlined"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          // {...(errors.oldPassword && {
+          //   error: true,
+          //   helperText: errors.oldPassword,
+          // })}
+        />
+        <TextField
+          fullWidth
+          id="outlined-basic"
+          label="Password"
+          type="password"
+          variant="outlined"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          // {...(errors.newPassword && {
+          //   error: true,
+          //   helperText: errors.newPassword,
+          // })}
+        />
+        <TextField
+          fullWidth
+          id="outlined-basic"
+          label="Confirm Password"
+          type="password_confirmation"
+          variant="outlined"
+          value={password_confirmation}
+          onChange={(e) => setPassword_confirmation(e.target.value)}
+          // {...(errors.newPassword && {
+          //   error: true,
+          //   helperText: errors.newPassword,
+          // })}
+        />
+
+        <Button onClick={handleSubmit}>Sign Up</Button>
+      <div>
+            Already a user?  Log in <Link to="/login">Here</Link>!
         </div>
-        <div>
-            Already a user?  Sign in <Link to="/login">Here</Link>!
-        </div>
-    </div>
+        </Stack>
+      </Paper>
+        
     )
 }
 export default Registration;
