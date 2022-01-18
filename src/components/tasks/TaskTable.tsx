@@ -82,6 +82,7 @@ const TaskTable: React.FC<{
 
   return (
     <>
+    {/* show details of task in a card */}
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={open}
@@ -96,6 +97,8 @@ const TaskTable: React.FC<{
           clearMessage={clearTaskSuccessMessage}
         />
       )}
+
+      {/* display tasks in a table */}
       <TblContainer>
         <TblHead />
         <TableBody>
