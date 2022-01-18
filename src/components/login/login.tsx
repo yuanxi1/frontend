@@ -1,17 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import {
-  loginPending,
-  loginSuccess,
-  loginFail,
-} from "../../reducers/loginSlice";
+import { Link, useNavigate } from "react-router-dom";
+import { logIn } from "../../reducers/loginSlice";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import AlertBar from "../alertBar";
+import { clearLoginError } from "../../reducers/loginSlice";
+
 export interface loginDataType {
   JWTToken: string;
   user: {};
@@ -23,33 +22,30 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
   const [password, setPassword] = useState("");
   const { isLoading, loggedIn, error } = useAppSelector((state) => state.login);
   //if isLoading, put a spinner, if there's error, alert the error
+  const loginError = useAppSelector((state) => state.login.error);
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("form sumbitted"); //
-
-    axios
-      .post("http://localhost:8000/api/v1/login", {
-        user: {
-          email: email,
-          password: password,
-        },
-      })
-      .then((response) => {
-        console.log(response); //
-        dispatch(loginPending());
-        props.handleLogin(response.data);
-        dispatch(loginSuccess());
+    const data = {
+      user: {
+        email: email,
+        password: password,
+      },
+    };
+    dispatch(logIn(data)).then(() => {
+      if (!loginError) {
         navigate("/home");
-      });
+      }
+    });
   };
 
   return (
     <Paper sx={{ padding: 3, borderRadius: 5, width: "80%", margin: "auto" }}>
-      <Typography>Log In</Typography>
+      {loginError && <AlertBar message={loginError} severity="error" clearMessage={clearLoginError}/>}
+      <Typography variant="h6">Log In</Typography>
 
       <Stack
         spacing={2}
@@ -88,35 +84,10 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
         />
 
         <Button onClick={handleSubmit}>Log In</Button>
+        <div>
+          New to the app? Sign up <Link to="/register">Here</Link>!
+        </div>
       </Stack>
-      {/* <Form>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control
-            type="email"
-            placeholder="Enter email"
-            required
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-          />
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            placeholder="Password"
-            required
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicCheckbox">
-          <Form.Check type="checkbox" label="Remember Me" />
-        </Form.Group>
-        <Button variant="primary" type="submit" onClick={handleSubmit}>
-          Log in
-        </Button>{" "}
-      </Form> */}
     </Paper>
   );
 };

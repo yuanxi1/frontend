@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
 import TextField from '@mui/material/TextField';
 import DatePicker from '@mui/lab/DatePicker';
 import { Paper, Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { taskUpdated } from "../../reducers/taskSlice";
-import authHeader from "../../api/auth-header";
+import { updateTask } from "../../reducers/taskSlice";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import TagInput from "./TagsInput";
 import parseISO from 'date-fns/parseISO'
 import format from 'date-fns/format'
+import AlertBar from "../alertBar";
+import { clearTaskErrorMessage } from "../../reducers/taskSlice";
 
 
 const EditTaskForm = () => {
@@ -25,21 +25,28 @@ const EditTaskForm = () => {
   const [tags, setTags] = useState(tag_list);
   const [duedate, setDuedate] = useState< Date >(task?.duedate ? parseISO(task?.duedate): new Date());
 
+  const errorMessage = useAppSelector(state=> state.task.error)
+  const successMessage = useAppSelector(state=> state.task.success)
+  useEffect(() => {
+    if(successMessage ==='updated'){
+    navigate('/home')}
+  }, [successMessage])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    axios.patch(`http://localhost:8000/api/v1/tasks/${taskId}`, 
-      {task: {
+    
+    if(taskId) {
+      const data = {
+        task: {
           title: title,
           description: description,
           tag_list: tags,
-          duedate: format(duedate, 'yyyy-MM-dd')
-      }}, 
-      {headers: authHeader()})
-      .then((response) => { 
-        console.log('update task', response.data)
-        dispatch(taskUpdated(response.data));
-        navigate("/home");
-      });
+          duedate: format(duedate, 'yyyy-MM-dd'),
+          taskId: taskId
+      }
+      }
+      dispatch(updateTask(data))
+    }
   };
 
   return (
@@ -53,6 +60,7 @@ const EditTaskForm = () => {
             padding: 2
             
     }}>
+      {errorMessage && <AlertBar message={errorMessage} severity="error" clearMessage={clearTaskErrorMessage}/> }
       <Button variant="outlined" color='secondary' onClick={() => navigate('/home')}>Go Back to Home Page</Button>
       <TextField 
           id="outlined-basic" 

@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { useAppDispatch, } from "../../app/hooks";
-import axios from "axios";
-import authHeader from "../../api/auth-header";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import TaskItem from "./TaskItem";
 import TagItem from "./TagItem";
 import {
+  clearTaskSuccessMessage,
   deleteTask,
-  taskUpdated
+  updateTask,
 } from "../../reducers/taskSlice";
 import { useNavigate } from "react-router-dom";
 import { Task } from "../../reducers/taskSlice";
@@ -16,8 +15,16 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import UndoIcon from "@mui/icons-material/Undo";
 import useTable from "../useTable";
-import { Backdrop, TableBody, TableCell, TableRow } from "@mui/material";
+import {
+  Backdrop,
+  TableBody,
+  TableCell,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
+import AlertBar from "../alertBar";
+import { parseISO } from "date-fns";
 
 const headCells = [
   { id: "title", label: "Title" },
@@ -33,42 +40,36 @@ const TaskTable: React.FC<{
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const [taskIndex, setTaskIndex] = useState(0);
-  const { TblContainer, TblHead } = useTable(headCells);
+  const today = new Date();
 
-  const handleDeleteTask = (taskId: Number) => {
+  const { TblContainer, TblHead } = useTable(headCells);
+  const successMessage = useAppSelector((state) => state.task.success);
+  const handleDeleteTask = (taskId: number) => {
     dispatch(deleteTask(taskId));
   };
 
-  const handleEditTask = (taskId: Number) => {
+  const handleEditTask = (taskId: number) => {
     navigate(`/edit_task/${taskId}`);
   };
-  const handleCompleteTask = (e: React.FormEvent, taskId: Number) => {
+  const handleCompleteTask = (e: React.FormEvent, taskId: number) => {
     e.preventDefault();
-    axios
-      .patch(
-        `http://localhost:8000/api/v1/tasks/${taskId}`,
-        {
-          task: { completed: true },
-        },
-        { headers: authHeader() }
-      )
-      .then((response) => {
-        dispatch(taskUpdated(response.data));
-      });
+    const data = {
+      task: {
+        completed: true,
+        taskId: taskId,
+      },
+    };
+    dispatch(updateTask(data));
   };
-  const handleUndoTask = (e: React.FormEvent, taskId: Number) => {
+  const handleUndoTask = (e: React.FormEvent, taskId: number) => {
     e.preventDefault();
-    axios
-      .patch(
-        `http://localhost:8000/api/v1/tasks/${taskId}`,
-        {
-          task: { completed: false },
-        },
-        { headers: authHeader() }
-      )
-      .then((response) => {
-        dispatch(taskUpdated(response.data));
-      });
+    const data = {
+      task: {
+        completed: false,
+        taskId: taskId,
+      },
+    };
+    dispatch(updateTask(data));
   };
   const handleShowTask = (index: number) => {
     setOpen(true);
@@ -88,7 +89,13 @@ const TaskTable: React.FC<{
       >
         {open && <TaskItem task={tasksToDisplay[taskIndex]} />}
       </Backdrop>
-
+      {successMessage && (
+        <AlertBar
+          message={"Task " + successMessage + " successfully!"}
+          severity="success"
+          clearMessage={clearTaskSuccessMessage}
+        />
+      )}
       <TblContainer>
         <TblHead />
         <TableBody>
@@ -106,7 +113,14 @@ const TaskTable: React.FC<{
                     sx={{ "&:hover": { cursor: "pointer" } }}
                     onClick={() => handleShowTask(index)}
                   >
-                    {task.title}
+                    <Typography
+                      sx={{
+                        color:
+                          task.completed || parseISO(task.duedate) >= today ? "black" : "#C62828",
+                      }}
+                    >
+                      {task.title}
+                    </Typography>
                   </TableCell>
                   <TableCell>
                     {task.tag_list.map((tag) => (

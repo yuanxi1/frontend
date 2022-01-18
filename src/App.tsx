@@ -6,7 +6,7 @@ import ProtectedRoute from "./protected_route"
 import EditTaskForm from "./components/tasks/UpdateTask";
 import AddTaskForm from "./components/tasks/AddTask";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useAppDispatch } from './app/hooks';
+import { useAppDispatch, useAppSelector } from './app/hooks';
 import { logOut } from './reducers/loginSlice';
 import  { NavBar } from './components/navBar';
 import { loginDataType } from "./components/login/login";
@@ -31,14 +31,6 @@ const Main = styled('div', { shouldForwardProp: (prop) => prop !== 'open' })<{
     duration: theme.transitions.duration.leavingScreen,
   }),
   marginLeft: theme.spacing(1),
-  ...(open && {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: `${drawerWidth}px`,
-  }),
-  
 }))
 const NavBarHeader = styled('div')(({theme}) => ({
   ...theme.mixins.toolbar,
@@ -47,6 +39,7 @@ const NavBarHeader = styled('div')(({theme}) => ({
 function App() {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
+  
 
   const handleLogin= (data: loginDataType) => {
     localStorage.setItem('user', JSON.stringify(data)); 
@@ -63,6 +56,7 @@ function App() {
         <BrowserRouter>
         <NavBar open={open} setOpen={setOpen} handleLogout={handleLogout}/>
         <NavBarHeader />
+        
         <Main open={open}>
           <Routes>
       

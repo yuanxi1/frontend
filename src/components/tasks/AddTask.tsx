@@ -1,48 +1,41 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useNavigate } from "react-router-dom";
-import { taskAdded } from "../../reducers/taskSlice";
-import authHeader from "../../api/auth-header";
+import { addTask } from "../../reducers/taskSlice";
 import TagInput from "./TagsInput";
 import TextField from '@mui/material/TextField';
 import { Paper } from "@mui/material";
 import { Button } from "@mui/material";
-import Switch from '@mui/material/Switch';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
 import format from 'date-fns/format'
+import AlertBar from "../alertBar";
+import { clearTaskErrorMessage } from "../../reducers/taskSlice";
 
 const AddTaskForm = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [showdate, setShowdate] = useState(false)
   const [duedate, setDuedate] = useState<Date>(new Date());
+  const successMessage = useAppSelector(state=> state.task.success)
+  const errorMessage = useAppSelector(state=> state.task.error)
   
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  useEffect(() => {
+    if(successMessage ==='added'){
+    navigate('/home')}
+  }, [successMessage])
 
-  // const handleToggle = () => {
-  //   setShowdate(prev => !prev);
-  // }
   const handleSubmit = (e: React.FormEvent) => { 
     e.preventDefault();
-    axios.post("http://localhost:8000/api/v1/tasks", 
-      {task: {
-          title: title,
-          description: description,
-          completed: false,
-          duedate: format(duedate, 'yyyy-MM-dd') ,
-          tag_list: tags
-      }}, 
-      {headers: authHeader()})
-      .then((response) => { 
-        
-        dispatch(taskAdded(response.data));
-        navigate('/home')
-      });
+    const data = {task: {
+            title: title,
+            description: description,
+            completed: false,
+            duedate: format(duedate, 'yyyy-MM-dd') ,
+            tag_list: tags
+        }}
+    dispatch(addTask(data))
   };
 
   return (
@@ -56,6 +49,8 @@ const AddTaskForm = () => {
             padding: 2
             
     }}>
+      {errorMessage && <AlertBar message={errorMessage} severity="error" clearMessage={clearTaskErrorMessage}/> }
+      {/* {successMessage && <AlertBar message={'Task '+successMessage+' successfully!'} severity="success" clearMessage={clearTaskSuccessMessage}/> } */}
       <Button variant="outlined" color='secondary' onClick={() => navigate('/home')}>Go Back to Home Page</Button>
       <TextField 
           id="outlined-basic" 
@@ -72,9 +67,6 @@ const AddTaskForm = () => {
         />
       <TagInput tags={tags} setTags={setTags} />
       
-      {/* <FormGroup>
-        <FormControlLabel control={<Switch onClick={handleToggle} />} label="Due Date" />
-      </FormGroup> */}  
         <DatePicker
           label="Due Date"
           value={duedate}

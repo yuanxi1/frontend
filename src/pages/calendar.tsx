@@ -9,33 +9,16 @@ import parse from 'date-fns/parse'
 import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
-import { styled } from '@mui/material/styles';
+import Backdrop from "@mui/material/Backdrop";
 import {
     fetchTasks,
     getSearchFilters,
     selectAllTasks,
     Task,
   } from "../reducers/taskSlice";
-
-  const styledCalendar = styled(Calendar)({
-    marginTop: '7%',
-//         marginLeft: '15%',
-//         height: '80vh',
-//         width: '80%',
-//         backgroundColor: 'rgba(255, 255, 255, 0.6)',
-
-  })
-  // , {
-    
-//         marginTop: '7%',
-//         marginLeft: '15%',
-//         height: '80vh',
-//         width: '80%',
-//         backgroundColor: 'rgba(255, 255, 255, 0.6)',
+import TaskItem from "../components/tasks/TaskItem";
 
 
-  
-// });
 const locales = {
     'en-US': enUS,
   }
@@ -52,6 +35,8 @@ const CalendarPage = () => {
   const dispatch = useAppDispatch();
   const filters = useAppSelector(getSearchFilters);
   const today = new Date();
+  const [open, setOpen] = useState(false);
+  const [taskToDisplay, setTaskToDisplay] = useState<Task | null>(null);
   useEffect(() => {
     const start = format(startOfWeek(startOfMonth(today)), 'yyyy-MM-dd')
     const end = format(endOfWeek(endOfMonth(today)), 'yyyy-MM-dd')
@@ -63,6 +48,10 @@ const CalendarPage = () => {
     dispatch(fetchTasks(filters));
   }, [filters]);
 
+
+  const handleCloseBackdrop = () => {
+    setOpen(false);
+  };
   const styleEvent= (event: Task) => {
     return event.completed
     ? {style: {backgroundColor: '#00C853'}} //green
@@ -73,6 +62,13 @@ const CalendarPage = () => {
   }
     const myEventsList = useAppSelector(selectAllTasks)
     return (<div>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={open}
+        onClick={handleCloseBackdrop}
+      >
+        {open && taskToDisplay && <TaskItem task={taskToDisplay} />}
+      </Backdrop>
       <Calendar
         localizer={localizer}
         events={myEventsList}
@@ -95,6 +91,7 @@ const CalendarPage = () => {
             }
           }
         }}
+        onSelectEvent={event => {setTaskToDisplay(event); setOpen(true)}}
         eventPropGetter={event => styleEvent(event)}
       />
     </div>)

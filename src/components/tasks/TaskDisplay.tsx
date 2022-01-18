@@ -15,8 +15,6 @@ import { Paper } from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Popover from "@mui/material/Popover";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import StaticDatePicker from "@mui/lab/StaticDatePicker";
 import { Typography } from "@mui/material";
 import TodayIcon from "@mui/icons-material/Today";
@@ -142,7 +140,6 @@ const TaskList: React.FC = () => {
             horizontal: "left",
           }}
         >
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
             <StaticDatePicker
               displayStaticWrapperAs="desktop"
               openTo="day"
@@ -155,7 +152,6 @@ const TaskList: React.FC = () => {
               }}
               renderInput={(params) => <TextField {...params} />}
             />
-          </LocalizationProvider>
         </Popover>
       </Toolbar>
 

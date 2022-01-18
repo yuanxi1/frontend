@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
@@ -6,33 +7,36 @@ import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import { clearLoginError, Register } from "../../reducers/loginSlice";
+import AlertBar from "../alertBar";
 
 const Registration = (props: { handleLogin: (arg0: any) => void; }) => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [password_confirmation, setPassword_confirmation] = useState('')
     let navigate = useNavigate();
+    const dispatch = useAppDispatch()
+    const loginError = useAppSelector((state) => state.login.error);
+
+    // useEffect(() => {
+    //   if(successMessage ==='account created!'){
+    //   navigate('/login')}
+    // }, [successMessage])
 
     const handleSubmit = (e: { preventDefault: () => void; }) => {
         e.preventDefault()
-        console.log("form sumbitted");
-        
-        axios.post("http://localhost:8000/api/v1/register", {
-          user: {
-            email: email,
-            password: password,
-            password_confirmation: password_confirmation,
-          },
-        }).then(response => {
-            console.log(response)
-            props.handleLogin(response.data)
-            navigate('/home')
-        });
+        const data = {user: {
+              email: email,
+              password: password,
+              password_confirmation: password_confirmation,
+            }}
+        dispatch(Register(data))
     }
 
     return (
       <Paper sx={{ padding: 3, borderRadius: 5, width: "80%", margin: "auto" }}>
-      <Typography>Log In</Typography>
+        {loginError && <AlertBar message={loginError} severity="error" clearMessage={clearLoginError}/>}
+      <Typography variant="h6">Sign Up</Typography>
 
       <Stack
         spacing={2}

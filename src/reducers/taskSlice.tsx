@@ -7,7 +7,10 @@ import {
 import axios from "axios";
 import authHeader from "../api/auth-header";
 import { RootState } from "../app/store";
+import { logOut } from "./loginSlice";
 import { SearchFilter } from "./searchSlice";
+import format from 'date-fns/format'
+
 
 const API_URL = "http://localhost:8000/api/v1/";
 
@@ -23,50 +26,91 @@ export interface Task {
   tag_list: Tag[];
   completed: boolean;
   duedate: string;
-  created_at: string;
 }
 interface taskState {
   tasks: Task[];
   status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | undefined;
+  error: string ;
+  success: "" | "added" | "deleted" | "updated";
+}
+interface addTaskFormData {
+  task: {
+    title: string,
+    description?: string,
+    completed: boolean,
+    duedate: string,
+    tag_list: string[]
+}
 }
 
-const initialState: taskState = {
-  tasks: [],
-  status: "idle",
-  error: "",
-};
 
-export const fetchAllTasks = createAsyncThunk("task/fetchAllTasks", async () => {
-  return axios
-    .get(API_URL + "tasks", { headers: authHeader() })
-    .then((response) => response.data);
-});
+const initialState: taskState = {
+  tasks: [],         //stores all the tasks to display
+  status: "idle",    //shows the fetch task status
+  error: "",         //stores any error message to display
+  success: ""        // stores any success message to display
+};
 
 export const fetchTasks = createAsyncThunk(
   "task/fetchTasks",
-  async (filters: SearchFilter) => {
-    // const tag_arr = filters.tags.reduce((prev, curr) => `&tag_name[]=${curr}` + prev, '') 
-    
+  async (filters: SearchFilter, { rejectWithValue, dispatch }) => {  
+    const show_overdue = format(new Date(), 'yyyy-MM-dd') === filters.due_from  && filters.due_from === filters.due_to
     return axios
       .get(
         API_URL +
-          `search?&tag_name=${filters.tag}&title=${filters.title}&date_from=${filters.due_from}&date_to=${filters.due_to}`,
+          `search?&tag_name=${filters.tag}&title=${filters.title}&date_from=${filters.due_from}&date_to=${filters.due_to}&show_overdue=${show_overdue}`,
         { headers: authHeader() }
       )
       .then((response) => {
         console.log(response.data);
         return response.data;
+      })
+      .catch((error) => {
+        if(error.response.status === 401){
+          dispatch(logOut())
+        }
+        return rejectWithValue(error.response.data.error);
+      });
+  }
+);
+export const addTask = createAsyncThunk(
+  "task/addTask",
+  async (data: addTaskFormData, { rejectWithValue, dispatch }) => {
+    return axios
+      .post(API_URL + `tasks/`, data, { headers: authHeader() })
+      .then((response) => response.data)
+      .catch((error) => {
+        if(error.response.status === 401){
+          dispatch(logOut())
+        }
+        return rejectWithValue(error.response.data.error);
+      });
+  }
+);
+export const deleteTask = createAsyncThunk(
+  "task/deleteTask",
+  async (taskId: Number, { rejectWithValue, dispatch }: any) => {
+    return axios
+      .delete(API_URL + `tasks/${taskId}`, { headers: authHeader() })
+      .then((response) => response.data)
+      .catch((error) => {
+        if(error.response.status === 401){
+          dispatch(logOut())
+        }
+        return rejectWithValue(error.response.data.error);
       });
   }
 );
 
-export const deleteTask = createAsyncThunk(
-  "task/deleteTask",
-  async (taskId: Number) => {
+export const updateTask = createAsyncThunk(
+  "task/updateTask",
+  async (data: {task:{taskId: string|number}}, { rejectWithValue }) => {
     return axios
-      .delete(API_URL + `tasks/${taskId}`, { headers: authHeader() })
-      .then((response) => response.data);
+      .patch(API_URL + `tasks/${data.task.taskId}`, data, { headers: authHeader() })
+      .then((response) => response.data)
+      .catch((error) => {
+        return rejectWithValue(error.response.data.error);
+      });
   }
 );
 
@@ -75,21 +119,26 @@ const taskSlice = createSlice({
   initialState,
   reducers: {
     taskAdded(state, action) {
-      //TODO: this is not right
-      state.tasks.push(action.payload.data.attributes);
+      state.success = 'added'
     },
-    taskUpdated(state, action) {
-      const { id, title, description, tag_list, completed } = action.payload.data.attributes;
-      const existingTask = state.tasks.find((task) => task.id === id);
+    // taskUpdated(state, action) {
+      // const { id, title, description, tag_list, completed } = action.payload.data.attributes;
+      // const existingTask = state.tasks.find((task) => task.id === id);
 
-      if (existingTask) {
-        existingTask.title = title;
-        existingTask.description = description;
-        existingTask.tag_list = tag_list;
-        existingTask.completed = completed;
+      // if (existingTask) {
+      //   existingTask.title = title;
+      //   existingTask.description = description;
+      //   existingTask.tag_list = tag_list;
+      //   existingTask.completed = completed;
 
-      }
+      // }
+    // },
+    clearTaskSuccessMessage(state) {
+      state.success = ''
     },
+    clearTaskErrorMessage(state) {
+      state.error=''
+    }
   },
   extraReducers(builder) {
     builder
@@ -104,19 +153,55 @@ const taskSlice = createSlice({
       })
       .addCase(fetchTasks.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message;
+        if (typeof action.payload === "string") {
+          state.error = action.payload;
+        }
       })
-      .addCase(deleteTask.fulfilled, (state, action) => {
+      .addCase(deleteTask.fulfilled, (state, action: PayloadAction<{
+        id: string;}>) => {
+        state.success = 'deleted'
+        const id = parseInt(action.payload.id)
         state.tasks = state.tasks.filter(
-          (task) => task.id !== action.payload.id
+          (task) => task.id !== id
         );
+      })
+      .addCase(deleteTask.rejected, (state, action) => {
+        if (typeof action.payload === "string") {
+          state.error = action.payload;
+        }
+      })
+      .addCase(addTask.fulfilled, (state) => {
+        state.success ='added'
+      })
+      .addCase(addTask.rejected, (state, action) => {
+        if (typeof action.payload === "string") {
+          state.error = action.payload;
+        }
+      })
+      .addCase(updateTask.fulfilled, (state, action) => {
+        state.success ='updated'
+        const { id, title, description, tag_list, completed } = action.payload.data.attributes;
+        const existingTask = state.tasks.find((task) => task.id === id);
+  
+        if (existingTask) {
+          existingTask.title = title;
+          existingTask.description = description;
+          existingTask.tag_list = tag_list;
+          existingTask.completed = completed;
+  
+        }
+      })
+      .addCase(updateTask.rejected, (state, action) => {
+        if (typeof action.payload === "string") {
+          state.error = action.payload;
+        }
       });
   },
 });
 
 const { reducer, actions } = taskSlice;
 
-export const { taskAdded, taskUpdated } = actions;
+export const { taskAdded, clearTaskSuccessMessage, clearTaskErrorMessage } = actions;
 export default reducer;
 
 ///////////////============= Useful Selectors =============////////////////
@@ -132,10 +217,6 @@ export const getSortedTasks = (filter: string) =>
       return [...tasks].sort((a, b) => a.title.localeCompare(b.title));
     } else if (filter === "z-a") {
       return [...tasks].sort((a, b) => b.title.localeCompare(a.title));
-    } else if (filter === "new-old") {
-      return [...tasks].sort(
-        (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)
-      );
     } else if (filter === "active-completed") {
       return [...tasks].sort(
         (a, b) => Number(a.completed) - Number(b.completed)
@@ -144,19 +225,7 @@ export const getSortedTasks = (filter: string) =>
       return tasks;
     }
   });
-
-export const getFilteredTasks = createSelector(
-  [selectAllTasks, getSearchFilters],
-  (tasks, filters) => {
-    return tasks.filter(
-      (task) =>
-        (!filters.title || task.title === filters.title) &&
-        //( filters.tags.length === 0 || filters.tags.every( input_tag => task.tag_list.some(tag => input_tag === tag.name))) &&
-        (!filters.due_from || task.duedate === filters.due_from) &&
-        (!filters.due_to || task.duedate === filters.due_to)
-    );
-  }
-);
+  
 export const getCompletedTasks = createSelector(
   selectAllTasks,
   (tasks) => {
