@@ -18,7 +18,9 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import HomeIcon from "@mui/icons-material/Home";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import SettingsIcon from "@mui/icons-material/Settings";
 import { useNavigate, useLocation } from "react-router-dom";
+import { alpha } from "@mui/material/styles";
 
 interface NavBarPropType {
   handleLogout: () => void;
@@ -69,12 +71,11 @@ export const NavBar: React.FC<NavBarPropType> = ({
           <CssBaseline />
           <AppBar
             position="fixed"
-            color="transparent"
+            sx={{ backgroundColor: alpha("#9E9E9E", 0.9) }}
             elevation={2}
             open={open}
           >
             <Toolbar>
-              
               <Typography
                 variant="h6"
                 noWrap
@@ -84,7 +85,7 @@ export const NavBar: React.FC<NavBarPropType> = ({
                 TODO
               </Typography>
 
-              <Button variant="outlined" onClick={handleLogout}>
+              <Button variant="outlined" color='secondary' onClick={handleLogout}>
                 Log Out
               </Button>
 
@@ -124,12 +125,10 @@ export const NavBar: React.FC<NavBarPropType> = ({
             open={open}
             onClose={handleDrawerClose}
           >
-            
-              <IconButton onClick={handleDrawerClose}>
-                <ChevronRightIcon />
-              </IconButton>
-            
-            
+            <IconButton onClick={handleDrawerClose}>
+              <ChevronRightIcon />
+            </IconButton>
+
             <List>
               <ListItem
                 button
@@ -157,9 +156,9 @@ export const NavBar: React.FC<NavBarPropType> = ({
                 </ListItemIcon>
                 <ListItemText primary={"Calendar"} />
               </ListItem>
-            </List>
-            <Divider />
-            <List>
+
+              <Divider />
+
               <ListItem
                 button
                 key={"tag"}
@@ -172,6 +171,20 @@ export const NavBar: React.FC<NavBarPropType> = ({
                   <LocalOfferIcon />
                 </ListItemIcon>
                 <ListItemText primary={"Manage Tags"} />
+              </ListItem>
+
+              <ListItem
+                button
+                key={"settings"}
+                onClick={() => {
+                  handleDrawerClose();
+                  navigate("/settings");
+                }}
+              >
+                <ListItemIcon>
+                  <SettingsIcon />
+                </ListItemIcon>
+                <ListItemText primary={"Settings"} />
               </ListItem>
             </List>
           </Drawer>

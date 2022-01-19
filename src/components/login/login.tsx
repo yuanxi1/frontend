@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { logIn } from "../../reducers/loginSlice";
+import { logIn } from "../../reducers/userSlice";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
@@ -9,7 +9,7 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import AlertBar from "../alertBar";
-import { clearLoginError } from "../../reducers/loginSlice";
+import { clearLoginError } from "../../reducers/userSlice";
 
 export interface loginDataType {
   JWTToken: string;
@@ -20,13 +20,16 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
 ) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { isLoading, loggedIn, error } = useAppSelector((state) => state.login);
+  const { isLoading, loggedIn, error } = useAppSelector((state) => state.user);
   //if isLoading, put a spinner, if there's error, alert the error
-  const loginError = useAppSelector((state) => state.login.error);
-
+  // const loginError = useAppSelector((state) => state.user.error);
+  useEffect(() => {
+    if (loggedIn) {
+      navigate("/home");
+    }
+  }, [loggedIn])
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const data = {
@@ -35,16 +38,19 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
         password: password,
       },
     };
-    dispatch(logIn(data)).then(() => {
-      if (!loginError) {
-        navigate("/home");
-      }
-    });
+    dispatch(logIn(data));
+  
   };
 
   return (
     <Paper sx={{ padding: 3, borderRadius: 5, width: "80%", margin: "auto" }}>
-      {loginError && <AlertBar message={loginError} severity="error" clearMessage={clearLoginError}/>}
+      {error && (
+        <AlertBar
+          message={error}
+          severity="error"
+          clearMessage={clearLoginError}
+        />
+      )}
       <Typography variant="h6">Log In</Typography>
 
       <Stack
@@ -58,7 +64,7 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
       >
         <TextField
           fullWidth
-          id="outlined-basic"
+          id="email"
           label="Email"
           type="email"
           variant="outlined"
@@ -71,7 +77,7 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
         />
         <TextField
           fullWidth
-          id="outlined-basic"
+          id="password"
           label="Password"
           type="password"
           variant="outlined"
@@ -83,7 +89,7 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
           // })}
         />
 
-        <Button onClick={handleSubmit}>Log In</Button>
+        <Button onClick={handleSubmit} disabled={isLoading}>Log In</Button>
         <div>
           New to the app? Sign up <Link to="/register">Here</Link>!
         </div>

@@ -17,7 +17,9 @@ import {
     Task,
   } from "../reducers/taskSlice";
 import TaskItem from "../components/tasks/TaskItem";
-
+import { alpha } from "@mui/material";
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
 
 const locales = {
     'en-US': enUS,
@@ -52,12 +54,22 @@ const CalendarPage = () => {
   const handleCloseBackdrop = () => {
     setOpen(false);
   };
+  const style = [
+    {color: '#00C853',
+     status: 'Completed'},
+    {color: '#F44336',
+    status: 'overdue'},
+    {color: '#FFC107',
+    status: 'active'}
+  ]
+ 
+
   const styleEvent= (event: Task) => {
     return event.completed
-    ? {style: {backgroundColor: '#00C853'}} //green
+    ? {style: {backgroundColor: style[0].color}} //green
     : parseISO(event.duedate) < today
-    ? {style:{backgroundColor: '#F44336'}} //orange
-    : {style:{backgroundColor: '#FFC107'}} //yellow
+    ? {style:{backgroundColor: style[1].color}}//orange
+    : {style:{backgroundColor: style[2].color}} //yellow
 
   }
     const myEventsList = useAppSelector(selectAllTasks)
@@ -69,6 +81,7 @@ const CalendarPage = () => {
       >
         {open && taskToDisplay && <TaskItem task={taskToDisplay} />}
       </Backdrop>
+    
       <Calendar
         localizer={localizer}
         events={myEventsList}
@@ -80,7 +93,7 @@ const CalendarPage = () => {
         toolbar={true}
         popup={true}
         popupOffset={0}
-        style={{ height: 600, margin:'5%', backgroundColor: '#F5F5F5' }}
+        style={{ height:600, margin:'1%', backgroundColor: alpha('#FFFFFF', 0.8), borderRadius:5 }}
         onRangeChange={(range , _view) => {
           if('start' in range && 'end' in range) {
             if(range.start instanceof Date && range.end instanceof Date){
@@ -94,6 +107,10 @@ const CalendarPage = () => {
         onSelectEvent={event => {setTaskToDisplay(event); setOpen(true)}}
         eventPropGetter={event => styleEvent(event)}
       />
+      <Stack direction='row' spacing={2}>
+        {style.map( ({color, status}) => 
+          <Chip sx ={{ bgcolor: color }} label= {status}/>)}
+      </Stack>
     </div>)
  }
 

@@ -54,7 +54,7 @@ const Home = () => {
         Add a new task
       </Button>
 
-      <Box sx={{  padding: 5, bgcolor: "#F5F5F5" }}>
+      {/* <Box sx={{  padding: 5, bgcolor: "#F5F5F5" }}> */}
         <Grid container spacing={3}>
           
           <Grid item lg={11} md={11} sm={12} xs={12}>
@@ -74,7 +74,7 @@ const Home = () => {
           </Grid>
 
         </Grid>
-      </Box>
+      {/* </Box> */}
     </div>
   );
 };

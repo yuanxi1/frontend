@@ -7,7 +7,7 @@ import EditTaskForm from "./components/tasks/UpdateTask";
 import AddTaskForm from "./components/tasks/AddTask";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from './app/hooks';
-import { logOut } from './reducers/loginSlice';
+import { logOut } from './reducers/userSlice';
 import  { NavBar } from './components/navBar';
 import { loginDataType } from "./components/login/login";
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
@@ -16,12 +16,13 @@ import { styled, useTheme } from "@mui/material";
 import { useState } from "react";
 import ManageTags from "./pages/manageTags";
 import ProfilePage from "./pages/manageProfile";
+import Settings from "./pages/settings";
 
 const drawerWidth = 240;
 
 const Main = styled('div', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean;
-}>(({ theme, open }) => ({
+}>(({ theme }) => ({
   flexGrow: 1,
   margin: theme.spacing(1),
   borderRadius: 10,
@@ -39,7 +40,7 @@ const NavBarHeader = styled('div')(({theme}) => ({
 function App() {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
-  
+  const bg_preference = useAppSelector(state=> state.user.bg_preference)
 
   const handleLogin= (data: loginDataType) => {
     localStorage.setItem('user', JSON.stringify(data)); 
@@ -51,13 +52,23 @@ function App() {
   };
 
   return (
-    <div>
+    <div
+    style={{
+      backgroundImage: `url('${process.env.PUBLIC_URL}/${bg_preference}.jpg')`,
+      backgroundPosition: 'center',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      
+    }}>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <BrowserRouter>
         <NavBar open={open} setOpen={setOpen} handleLogout={handleLogout}/>
         <NavBarHeader />
         
-        <Main open={open}>
+        <Main >
           <Routes>
       
             <Route 
@@ -87,6 +98,9 @@ function App() {
             </Route>
             <Route path='/profile' element={<ProtectedRoute />}>
               <Route path='/profile' element={<ProfilePage />} />
+            </Route>
+            <Route path='/settings' element={<ProtectedRoute />}>
+              <Route path='/settings' element={<Settings />} />
             </Route>
 
           </Routes>

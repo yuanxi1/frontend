@@ -7,7 +7,7 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import { logOut } from "../reducers/loginSlice";
+import { logOut } from "../reducers/userSlice";
 
 const ProfilePage = () => {
   const dispatch = useAppDispatch();

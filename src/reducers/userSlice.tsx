@@ -6,19 +6,21 @@ import {
 import axios from "axios";
 const API_URL = "http://localhost:8000/api/v1/";
 interface loginState {
-  isLoading: Boolean;
-  loggedIn: Boolean;
+  isLoading: boolean;
+  loggedIn: boolean;
   error: string;
+  bg_preference: number;
 }
 
 const initialState: loginState = {
   isLoading: false,
   loggedIn: !!localStorage.getItem("user"),
   error: "",
+  bg_preference:1
 };
 
 export const logIn = createAsyncThunk(
-  "login/login",
+  "user/login",
   async (
     data: {
       user: {
@@ -31,8 +33,9 @@ export const logIn = createAsyncThunk(
     return axios
       .post(API_URL + "login", data)
       .then((response) => {
-        console.log("response", response);
+        // console.log("response", response);
         localStorage.setItem('user', JSON.stringify(response.data)); 
+        return response.data.user.data.attributes
       })
       .catch((error) => {
         return rejectWithValue(error.response.data.error);
@@ -40,7 +43,7 @@ export const logIn = createAsyncThunk(
   }
 );
 export const Register = createAsyncThunk(
-    "login/register",
+    "user/register",
     async (
       data: {
         user: {
@@ -63,7 +66,7 @@ export const Register = createAsyncThunk(
     }
   );
 const loginSlice = createSlice({
-  name: "login",
+  name: "user",
   initialState,
   reducers: {
     logOut: (state) => {
@@ -76,7 +79,10 @@ const loginSlice = createSlice({
     },
     setError: (state, action: PayloadAction<string>) => {
         state.error = action.payload
-    }
+    },
+    setBg_Preference: ((state, action: PayloadAction<number>) => {
+      state.bg_preference = action.payload
+    })
   },
   extraReducers(builder) {
     builder
@@ -84,11 +90,12 @@ const loginSlice = createSlice({
         // state.status = "loading";
         state.isLoading = true;
       })
-      .addCase(logIn.fulfilled, (state, action) => {
+      .addCase(logIn.fulfilled, (state, action: PayloadAction<{bg_preference: number}>) => {
         // state.status = "succeeded";
         state.isLoading = false;
         state.loggedIn = true;
         state.error = "";
+        state.bg_preference = action.payload.bg_preference
       })
       .addCase(logIn.rejected, (state, action) => {
         state.isLoading = false;
@@ -111,5 +118,5 @@ const loginSlice = createSlice({
 
 const { reducer, actions } = loginSlice;
 
-export const { logOut, clearLoginError, setError } = actions;
+export const { logOut, clearLoginError, setError, setBg_Preference } = actions;
 export default reducer;

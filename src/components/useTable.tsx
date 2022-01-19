@@ -7,7 +7,7 @@ import {
 
 
 } from "@mui/material";
-import React from "react";
+import TableContainer from '@mui/material/TableContainer';
 
 
 
@@ -21,7 +21,7 @@ export default function useTable(
 
   const TblContainer = (props: any) => {
     ///???
-    return <Table sx={{ width: '100%', maxWidth:'320'}}>{props.children}</Table>;
+    return <Table stickyHeader sx={{ width: '100%', maxWidth:'320'}}>{props.children}</Table>;
   };
 
   const TblHead = (props: any) => {

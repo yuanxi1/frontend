@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from './app/hooks';
-import { logOut } from './reducers/loginSlice';
+import { logOut } from './reducers/userSlice';
 const ProtectedRoute = () => {
     const dispatch = useAppDispatch()
     const user = localStorage.getItem('user');
@@ -14,7 +14,7 @@ const ProtectedRoute = () => {
       dispatch(logOut())
     }}
 
-    const loggedIn = useAppSelector(state => state.login.loggedIn);
+    const loggedIn = useAppSelector(state => state.user.loggedIn);
     return (
         loggedIn
         ? <Outlet />

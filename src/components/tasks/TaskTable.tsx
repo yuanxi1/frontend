@@ -25,6 +25,9 @@ import {
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
 import AlertBar from "../alertBar";
 import { parseISO } from "date-fns";
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import { subDays } from 'date-fns'
 
 const headCells = [
   { id: "title", label: "Title" },
@@ -40,7 +43,7 @@ const TaskTable: React.FC<{
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const [taskIndex, setTaskIndex] = useState(0);
-  const today = new Date();
+  const yesterday = subDays(new Date(), 1);
 
   const { TblContainer, TblHead } = useTable(headCells);
   const successMessage = useAppSelector((state) => state.task.success);
@@ -119,7 +122,7 @@ const TaskTable: React.FC<{
                     <Typography
                       sx={{
                         color:
-                          task.completed || parseISO(task.duedate) >= today ? "black" : "#C62828",
+                          task.completed || parseISO(task.duedate) > yesterday ? "black" : "#C62828",
                       }}
                     >
                       {task.title}

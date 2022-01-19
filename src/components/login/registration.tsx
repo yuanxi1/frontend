@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { clearLoginError, Register } from "../../reducers/loginSlice";
+import { clearLoginError, Register } from "../../reducers/userSlice";
 import AlertBar from "../alertBar";
 
 const Registration = (props: { handleLogin: (arg0: any) => void; }) => {
@@ -16,7 +15,7 @@ const Registration = (props: { handleLogin: (arg0: any) => void; }) => {
     const [password_confirmation, setPassword_confirmation] = useState('')
     let navigate = useNavigate();
     const dispatch = useAppDispatch()
-    const loginError = useAppSelector((state) => state.login.error);
+    const loginError = useAppSelector((state) => state.user.error);
 
     // useEffect(() => {
     //   if(successMessage ==='account created!'){

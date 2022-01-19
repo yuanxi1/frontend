@@ -7,7 +7,7 @@ import {
 import axios from "axios";
 import authHeader from "../api/auth-header";
 import { RootState } from "../app/store";
-import { logOut } from "./loginSlice";
+import { logOut } from "./userSlice";
 import { SearchFilter } from "./searchSlice";
 import format from 'date-fns/format'
 
