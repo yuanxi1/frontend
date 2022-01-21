@@ -17,7 +17,8 @@ import { useState } from "react";
 import ManageTags from "./pages/manageTags";
 import ProfilePage from "./pages/manageProfile";
 import Settings from "./pages/settings";
-
+import { clearErrorAlert } from "./reducers/alertSlice";
+import AlertBar from "./components/alertBar";
 const drawerWidth = 240;
 
 const Main = styled('div', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -41,6 +42,7 @@ function App() {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const bg_preference = useAppSelector(state=> state.user.bg_preference)
+  const errorMessage = useAppSelector(state => state.alert.error)
 
   const handleLogin= (data: loginDataType) => {
     localStorage.setItem('user', JSON.stringify(data)); 
@@ -48,6 +50,7 @@ function App() {
   };
   const handleLogout= () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     dispatch(logOut());    
   };
 
@@ -63,6 +66,13 @@ function App() {
       flexDirection: 'column',
       
     }}>
+      {errorMessage && (
+        <AlertBar
+          message={errorMessage}
+          severity="error"
+          clearMessage={clearErrorAlert}
+        />
+      )}
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <BrowserRouter>
         <NavBar open={open} setOpen={setOpen} handleLogout={handleLogout}/>

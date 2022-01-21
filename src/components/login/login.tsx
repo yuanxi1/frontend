@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { logIn } from "../../reducers/userSlice";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
@@ -8,8 +7,7 @@ import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import AlertBar from "../alertBar";
-import { clearLoginError } from "../../reducers/userSlice";
+
 
 export interface loginDataType {
   JWTToken: string;
@@ -20,9 +18,9 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
 ) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { isLoading, loggedIn, error } = useAppSelector((state) => state.user);
+  const { isLoading, loggedIn } = useAppSelector((state) => state.user);
   //if isLoading, put a spinner, if there's error, alert the error
-  // const loginError = useAppSelector((state) => state.user.error);
+
   useEffect(() => {
     if (loggedIn) {
       navigate("/home");
@@ -44,13 +42,6 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
 
   return (
     <Paper sx={{ padding: 3, borderRadius: 5, width: "80%", margin: "auto" }}>
-      {error && (
-        <AlertBar
-          message={error}
-          severity="error"
-          clearMessage={clearLoginError}
-        />
-      )}
       <Typography variant="h6">Log In</Typography>
 
       <Stack

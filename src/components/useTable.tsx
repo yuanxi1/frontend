@@ -24,7 +24,7 @@ export default function useTable(
     return <Table stickyHeader sx={{ width: '100%', maxWidth:'320'}}>{props.children}</Table>;
   };
 
-  const TblHead = (props: any) => {
+  const TblHead = () => {
     ///???
     return (
       <TableHead >

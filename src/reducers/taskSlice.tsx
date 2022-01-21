@@ -15,7 +15,7 @@ import format from 'date-fns/format'
 const API_URL = "http://localhost:8000/api/v1/";
 
 export interface Tag {
-  id: string;
+  id: number;
   name: string;
 }
 

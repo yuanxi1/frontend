@@ -4,19 +4,27 @@ import {
   createAsyncThunk,
 } from "@reduxjs/toolkit/";
 import axios from "axios";
+import { setErrorAlert } from "./alertSlice";
+
 const API_URL = "http://localhost:8000/api/v1/";
+const get_bg_preference = () => {
+  const user = localStorage.getItem("user")
+  if(user){
+  console.log(JSON.parse(user).bg_preference);}
+  return user 
+  ? JSON.parse(user).bg_preference
+  : 1;
+}
 interface loginState {
   isLoading: boolean;
   loggedIn: boolean;
-  error: string;
   bg_preference: number;
 }
 
 const initialState: loginState = {
   isLoading: false,
   loggedIn: !!localStorage.getItem("user"),
-  error: "",
-  bg_preference:1
+  bg_preference: get_bg_preference()
 };
 
 export const logIn = createAsyncThunk(
@@ -28,17 +36,18 @@ export const logIn = createAsyncThunk(
         password: string;
       };
     },
-    { rejectWithValue }
+    { rejectWithValue, dispatch }
   ) => {
     return axios
       .post(API_URL + "login", data)
       .then((response) => {
-        // console.log("response", response);
-        localStorage.setItem('user', JSON.stringify(response.data)); 
+        localStorage.setItem('token', JSON.stringify(response.data.JWTToken));
+        localStorage.setItem('user', JSON.stringify(response.data.user.data.attributes)); 
         return response.data.user.data.attributes
       })
       .catch((error) => {
-        return rejectWithValue(error.response.data.error);
+        dispatch(setErrorAlert(error.response.data.error))
+        return rejectWithValue(error);
       });
   }
 );
@@ -52,7 +61,7 @@ export const Register = createAsyncThunk(
             password_confirmation: string,
           };
       },
-      { rejectWithValue }
+      { rejectWithValue, dispatch }
     ) => {
       return axios
         .post(API_URL + "register", data)
@@ -60,8 +69,8 @@ export const Register = createAsyncThunk(
           console.log("response", response);
         })
         .catch((error) => {
-          
-          return rejectWithValue(error.response.data.error);
+        dispatch(setErrorAlert(error.response.data.error))
+        return rejectWithValue(error);
         });
     }
   );
@@ -72,13 +81,7 @@ const loginSlice = createSlice({
     logOut: (state) => {
       state.isLoading = false;
       state.loggedIn = false;
-      state.error = "";
-    },
-    clearLoginError: (state) => {
-        state.error = "";
-    },
-    setError: (state, action: PayloadAction<string>) => {
-        state.error = action.payload
+      
     },
     setBg_Preference: ((state, action: PayloadAction<number>) => {
       state.bg_preference = action.payload
@@ -94,29 +97,27 @@ const loginSlice = createSlice({
         // state.status = "succeeded";
         state.isLoading = false;
         state.loggedIn = true;
-        state.error = "";
         state.bg_preference = action.payload.bg_preference
       })
       .addCase(logIn.rejected, (state, action) => {
         state.isLoading = false;
         state.loggedIn = false;
-        if (typeof action.payload === "string") {
-          state.error = action.payload;
-        }
+        // if (typeof action.payload === "string") {
+        //   state.error = action.payload;
+        // }
       })
       .addCase(Register.fulfilled, (state, action) => {
         // state.status = "succeeded";
-        state.error = "";
       })
       .addCase(Register.rejected, (state, action) => {
-        if (typeof action.payload === "string") {
-          state.error = action.payload;
-        }
+        // if (typeof action.payload === "string") {
+        //   state.error = action.payload;
+        // }
       });
   },
 });
 
 const { reducer, actions } = loginSlice;
 
-export const { logOut, clearLoginError, setError, setBg_Preference } = actions;
+export const { logOut, setBg_Preference } = actions;
 export default reducer;

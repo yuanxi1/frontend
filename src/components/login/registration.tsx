@@ -6,7 +6,7 @@ import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { clearLoginError, Register } from "../../reducers/userSlice";
+import { Register } from "../../reducers/userSlice";
 import AlertBar from "../alertBar";
 
 const Registration = (props: { handleLogin: (arg0: any) => void; }) => {
@@ -15,8 +15,7 @@ const Registration = (props: { handleLogin: (arg0: any) => void; }) => {
     const [password_confirmation, setPassword_confirmation] = useState('')
     let navigate = useNavigate();
     const dispatch = useAppDispatch()
-    const loginError = useAppSelector((state) => state.user.error);
-
+    
     // useEffect(() => {
     //   if(successMessage ==='account created!'){
     //   navigate('/login')}
@@ -34,7 +33,7 @@ const Registration = (props: { handleLogin: (arg0: any) => void; }) => {
 
     return (
       <Paper sx={{ padding: 3, borderRadius: 5, width: "80%", margin: "auto" }}>
-        {loginError && <AlertBar message={loginError} severity="error" clearMessage={clearLoginError}/>}
+        
       <Typography variant="h6">Sign Up</Typography>
 
       <Stack

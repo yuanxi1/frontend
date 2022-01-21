@@ -3,16 +3,16 @@ import { useAppSelector, useAppDispatch } from './app/hooks';
 import { logOut } from './reducers/userSlice';
 const ProtectedRoute = () => {
     const dispatch = useAppDispatch()
-    const user = localStorage.getItem('user');
+    // const token = localStorage.getItem('token');
     
-    if (user) {
-    const token = JSON.parse(user).JWTToken
-    const decodedJwt = JSON.parse(window.atob(token.split(".")[1]))
-    if (decodedJwt.exp * 1000 < Date.now()) {
-      console.log('expired')
-      localStorage.removeItem('user');
-      dispatch(logOut())
-    }}
+    // if (token) {
+    // // const token = JSON.parse(token)
+    // const decodedJwt = JSON.parse(window.atob(token.split(".")[1]))
+    // if (decodedJwt.exp * 1000 < Date.now()) {
+    //   console.log('expired')
+    //   localStorage.removeItem('user');
+    //   dispatch(logOut())
+    // }}
 
     const loggedIn = useAppSelector(state => state.user.loggedIn);
     return (

@@ -20,6 +20,7 @@ import TaskItem from "../components/tasks/TaskItem";
 import { alpha } from "@mui/material";
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
+import {subDays} from "date-fns"
 
 const locales = {
     'en-US': enUS,
@@ -37,6 +38,7 @@ const CalendarPage = () => {
   const dispatch = useAppDispatch();
   const filters = useAppSelector(getSearchFilters);
   const today = new Date();
+  const yesterday = subDays(today, 1);
   const [open, setOpen] = useState(false);
   const [taskToDisplay, setTaskToDisplay] = useState<Task | null>(null);
   useEffect(() => {
@@ -67,7 +69,7 @@ const CalendarPage = () => {
   const styleEvent= (event: Task) => {
     return event.completed
     ? {style: {backgroundColor: style[0].color}} //green
-    : parseISO(event.duedate) < today
+    : parseISO(event.duedate) <= yesterday
     ? {style:{backgroundColor: style[1].color}}//orange
     : {style:{backgroundColor: style[2].color}} //yellow
 
