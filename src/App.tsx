@@ -1,42 +1,41 @@
-import Login from "./components/login/login";
-import Home from "./pages/home";
-import CalendarPage from './pages/calendar'
-import Registration from "./components/login/registration";
-import ProtectedRoute from "./protected_route"
-import EditTaskForm from "./components/tasks/UpdateTask";
-import AddTaskForm from "./components/tasks/AddTask";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useState } from "react";
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import { logOut } from './reducers/userSlice';
-import  { NavBar } from './components/navBar';
-import { loginDataType } from "./components/login/login";
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import { styled, useTheme } from "@mui/material";
-import { useState } from "react";
+import { clearErrorAlert } from "./reducers/alertSlice";
+
+import Login from "./components/login/login";
+import Home from "./pages/home";
+import CalendarPage from './pages/calendar';
 import ManageTags from "./pages/manageTags";
 import ProfilePage from "./pages/manageProfile";
 import Settings from "./pages/settings";
-import { clearErrorAlert } from "./reducers/alertSlice";
+import Registration from "./components/login/registration";
+import ProtectedRoute from "./protected_route"
+import EditTaskForm from "./components/tasks/taskForm/UpdateTask";
+import AddTaskForm from "./components/tasks/taskForm/AddTask";
 import AlertBar from "./components/alertBar";
-const drawerWidth = 240;
+import  { NavBar } from './components/navBar';
 
-const Main = styled('div', { shouldForwardProp: (prop) => prop !== 'open' })<{
-  open?: boolean;
-}>(({ theme }) => ({
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import { styled, useTheme } from "@mui/material";
+
+import { loginDataType } from "./components/login/login";
+
+const Main = styled('div')( ({ theme }) => ({
   flexGrow: 1,
   margin: theme.spacing(1),
   borderRadius: 10,
-  ...theme.mixins.toolbar,
-  transition: theme.transitions.create('margin', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  marginLeft: theme.spacing(1),
+  // ...theme.mixins.toolbar,
+  // transition: theme.transitions.create('margin', {
+  //   easing: theme.transitions.easing.sharp,
+  //   duration: theme.transitions.duration.leavingScreen,
+  // }),
+  // marginLeft: theme.spacing(1),
 }))
 const NavBarHeader = styled('div')(({theme}) => ({
   ...theme.mixins.toolbar,
-  
 }))
 function App() {
   const dispatch = useAppDispatch();
@@ -64,6 +63,7 @@ function App() {
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
+      minWidth: "500px",
       
     }}>
       {errorMessage && (
@@ -85,12 +85,10 @@ function App() {
               path={"/login"}  
               element={<Login handleLogin = {handleLogin} />} 
             />
-            
             <Route
               path={"/register"}
-              element={<Registration handleLogin = {handleLogin} />}
+              element={<Registration />}
             />
-            
             <Route path='/home' element={<ProtectedRoute />}>
               <Route path='/home' element={<Home />} />
             </Route>
@@ -116,9 +114,7 @@ function App() {
           </Routes>
           </Main>
         </BrowserRouter>
-        </LocalizationProvider>
-      
-      
+        </LocalizationProvider> 
     </div>
   );
 }

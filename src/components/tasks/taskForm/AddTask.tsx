@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { useNavigate } from "react-router-dom";
-import { addTask } from "../../reducers/taskSlice";
+import { addTask } from "../../../reducers/taskSlice";
 import TagInput from "./TagsInput";
 import TextField from '@mui/material/TextField';
-import { Paper } from "@mui/material";
+import  Paper  from "@mui/material/Paper";
 import { Button } from "@mui/material";
 import DatePicker from '@mui/lab/DatePicker';
 import format from 'date-fns/format'
-import AlertBar from "../alertBar";
-import { clearTaskErrorMessage } from "../../reducers/taskSlice";
 
 const AddTaskForm = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [duedate, setDuedate] = useState<Date>(new Date());
+  const [error, setError] = useState<string>('')
   const successMessage = useAppSelector(state=> state.task.success)
-  const errorMessage = useAppSelector(state=> state.task.error)
+  
   
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -26,8 +25,16 @@ const AddTaskForm = () => {
     navigate('/home')}
   }, [successMessage])
 
+  const validate = () => {
+    const temp = title === ''
+    ? 'This field cannot be blank'
+    : ''
+    setError(temp)
+    return temp===''
+  }
   const handleSubmit = (e: React.FormEvent) => { 
     e.preventDefault();
+    if(validate()){
     const data = {task: {
             title: title,
             description: description,
@@ -36,6 +43,7 @@ const AddTaskForm = () => {
             tag_list: tags
         }}
     dispatch(addTask(data))
+      }
   };
 
   return (
@@ -49,15 +57,16 @@ const AddTaskForm = () => {
             padding: 2
             
     }}>
-      {errorMessage && <AlertBar message={errorMessage} severity="error" clearMessage={clearTaskErrorMessage}/> }
-      {/* {successMessage && <AlertBar message={'Task '+successMessage+' successfully!'} severity="success" clearMessage={clearTaskSuccessMessage}/> } */}
+      
       <Button variant="outlined" color='secondary' onClick={() => navigate('/home')}>Go Back to Home Page</Button>
       <TextField 
           id="outlined-basic" 
           label="Title" 
           variant="outlined"
           value={title} 
-          onChange={e => setTitle(e.target.value)} />
+          onChange={e => setTitle(e.target.value)} 
+          error={error!==''}
+          helperText={error}/>
       <TextField
           id="outlined-multiline-flexible"
           label="Description"
@@ -75,9 +84,10 @@ const AddTaskForm = () => {
             if(newValue){
             setDuedate(newValue);}
           }}
-          renderInput={(params) => <TextField {...params} />}
+          renderInput={(params) => <TextField disabled {...params} />}
         />
          <Button variant="contained" onClick={handleSubmit}>Add</Button>
+
         </Paper>
   );
 };

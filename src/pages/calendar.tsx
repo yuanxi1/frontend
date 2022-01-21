@@ -16,7 +16,7 @@ import {
     selectAllTasks,
     Task,
   } from "../reducers/taskSlice";
-import TaskItem from "../components/tasks/TaskItem";
+import TaskItem from "../components/tasks/taskDisplay/TaskItem";
 import { alpha } from "@mui/material";
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';

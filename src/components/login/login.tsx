@@ -19,7 +19,18 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { isLoading, loggedIn } = useAppSelector((state) => state.user);
-  //if isLoading, put a spinner, if there's error, alert the error
+  
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
+  const validate = () => {
+    let temp = { email: "", password: ""};
+    temp.email = email.match(/^[^ ]+@[^ ]+\.[a-z]{2,3}$/) ? "" : "Invalid Email.";
+    temp.password = password.length > 5 ? "" : "Must not be less than 6 characters.";
+    setErrors(temp);
+    return Object.values(temp).every((x) => x === "");
+  };
 
   useEffect(() => {
     if (loggedIn) {
@@ -30,13 +41,15 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
   const dispatch = useAppDispatch();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const data = {
-      user: {
-        email: email,
-        password: password,
-      },
-    };
-    dispatch(logIn(data));
+    if(validate()) {
+      const data = {
+        user: {
+          email: email,
+          password: password,
+        },
+      };
+      dispatch(logIn(data));
+    }
   
   };
 
@@ -61,10 +74,10 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
           variant="outlined"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          // {...(errors.oldPassword && {
-          //   error: true,
-          //   helperText: errors.oldPassword,
-          // })}
+          {...(errors.email && {
+            error: true,
+            helperText: errors.email,
+          })}
         />
         <TextField
           fullWidth
@@ -74,10 +87,10 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
           variant="outlined"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          // {...(errors.newPassword && {
-          //   error: true,
-          //   helperText: errors.newPassword,
-          // })}
+          {...(errors.password && {
+            error: true,
+            helperText: errors.password,
+          })}
         />
 
         <Button onClick={handleSubmit} disabled={isLoading}>Log In</Button>

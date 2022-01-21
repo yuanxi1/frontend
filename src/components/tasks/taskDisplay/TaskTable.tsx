@@ -1,20 +1,20 @@
 import { useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import TaskItem from "./TaskItem";
 import TagItem from "./TagItem";
 import {
   clearTaskSuccessMessage,
   deleteTask,
   updateTask,
-} from "../../reducers/taskSlice";
+} from "../../../reducers/taskSlice";
 import { useNavigate } from "react-router-dom";
-import { Task } from "../../reducers/taskSlice";
+import { Task } from "../../../types/interface";
 
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import UndoIcon from "@mui/icons-material/Undo";
-import useTable from "../useTable";
+import useTable from "./useTable";
 import {
   Backdrop,
   TableBody,
@@ -23,11 +23,9 @@ import {
   Typography,
 } from "@mui/material";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
-import AlertBar from "../alertBar";
+import AlertBar from "../../alertBar";
 import { parseISO } from "date-fns";
-import TableContainer from '@mui/material/TableContainer';
-import Table from '@mui/material/Table';
-import { subDays } from 'date-fns'
+import { subDays } from 'date-fns';
 
 const headCells = [
   { id: "title", label: "Title" },
@@ -38,7 +36,7 @@ const headCells = [
 const TaskTable: React.FC<{
   tasksToDisplay: Task[];
   showCompleted: boolean;
-}> = ({ tasksToDisplay, showCompleted }) => {
+}> = ({ tasksToDisplay, showCompleted}) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);

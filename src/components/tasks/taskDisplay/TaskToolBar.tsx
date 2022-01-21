@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import {
   updateDueFromFilter,
   updateDueToFilter,
   clearFilters,
-} from "../../reducers/searchSlice";
-import { getSortedTasks } from "../../reducers/taskSlice";
+} from "../../../reducers/searchSlice";
+import { getSearchFilters } from "../../../reducers/taskSlice";
 
 import IconButton from "@mui/material/IconButton";
 import Switch from "@mui/material/Switch";
@@ -16,17 +16,22 @@ import StaticDatePicker from "@mui/lab/StaticDatePicker";
 import { Typography } from "@mui/material";
 import TodayIcon from "@mui/icons-material/Today";
 import TextField from "@mui/material/TextField";
-import { format, addDays } from "date-fns";
+import { format, addDays, parseISO } from "date-fns";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
+import SortIcon from '@mui/icons-material/Sort';
 
 const TaskToolBar: React.FC<{
+  order: string
+  setOrder: React.Dispatch<React.SetStateAction<string>>
   setShowCompleted: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ setShowCompleted }) => {
+  tasksNumber: number;
+}> = ({ order, setOrder, setShowCompleted, tasksNumber }) => {
   const dispatch = useAppDispatch();
-
-  const tasksToDisplay = useAppSelector(getSortedTasks("active-completed"));
+  const filters = useAppSelector(getSearchFilters);
+  
   //Show completed tasks or not
   const handleToggle = () => {
     setShowCompleted((prev) => !prev);
@@ -38,7 +43,7 @@ const TaskToolBar: React.FC<{
   const formatedToday = format(today, "yyyy-MM-dd");
   const formatedNext7Days = format(next7Days, "yyyy-MM-dd");
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleChangeDate = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
@@ -57,6 +62,19 @@ const TaskToolBar: React.FC<{
   };
   const openMenu = Boolean(anchorElMenu);
 
+  //sort
+  const handleSortAlph = () => {
+    order === 'a-z'? setOrder('z-a') : setOrder('a-z')
+  }
+  const handleSortDate = () => {
+    order === 'new-old'? setOrder('') : setOrder('new-old')
+  }
+  const message = `You have ${tasksNumber} task` 
+  + ((tasksNumber > 1) ? 's' : '')
+  + (filters.due_to && filters.due_to === filters.due_from 
+      ?`  [${format(parseISO(filters.due_to), 'EEEE | MMM d')}]`
+      : ''
+    )
   return (
     <Toolbar
       sx={{
@@ -71,10 +89,29 @@ const TaskToolBar: React.FC<{
       }}
     >
       <Typography sx={{ flex: "1 1 100%" }} variant="h6">
-        You have {tasksToDisplay.length} task(s).{" "}
+       {message}
       </Typography>
+
+      <Tooltip title="Sort Alphabetically">
+        <IconButton
+          id="sort-alph"
+          onClick={handleSortAlph}
+        >
+          <SortByAlphaIcon />
+        </IconButton>
+      </Tooltip>
+
+      <Tooltip title="Sort by due date">
+        <IconButton
+          id="sort-date"
+          onClick={handleSortDate}
+        >
+          <SortIcon />
+        </IconButton>
+      </Tooltip>
+
       <Tooltip title="Change date">
-        <IconButton onClick={handleClick}>
+        <IconButton onClick={handleChangeDate}>
           <TodayIcon />
         </IconButton>
       </Tooltip>
@@ -103,7 +140,7 @@ const TaskToolBar: React.FC<{
         <MenuItem
           onClick={() => {
             dispatch(updateDueFromFilter(formatedToday));
-            dispatch(updateDueToFilter(formatedToday));
+            dispatch(updateDueToFilter(formatedToday)); 
           }}
         >
           Today
@@ -140,9 +177,9 @@ const TaskToolBar: React.FC<{
           value={today}
           onChange={(newValue) => {
             const date = newValue ? format(newValue, "yyyy-MM-dd") : "";
+            const displaydate = newValue ? format(newValue, 'EEEE MMM d') : "";
             dispatch(updateDueFromFilter(date));
             dispatch(updateDueToFilter(date));
-            console.log(newValue);
           }}
           renderInput={(params) => <TextField {...params} />}
         />

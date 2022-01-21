@@ -74,6 +74,7 @@ export const Register = createAsyncThunk(
         });
     }
   );
+
 const loginSlice = createSlice({
   name: "user",
   initialState,

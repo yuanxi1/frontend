@@ -21,6 +21,7 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useNavigate, useLocation } from "react-router-dom";
 import { alpha } from "@mui/material/styles";
+import { Stack } from "@mui/material";
 
 interface NavBarPropType {
   handleLogout: () => void;
@@ -84,6 +85,10 @@ export const NavBar: React.FC<NavBarPropType> = ({
               >
                 TODO
               </Typography>
+              <Stack direction={'row'} spacing={1}>
+              <Button variant="contained" onClick={() => navigate("/add_task")}>
+                Add a new task
+              </Button>
 
               <Button variant="outlined" color='secondary' onClick={handleLogout}>
                 Log Out
@@ -108,6 +113,7 @@ export const NavBar: React.FC<NavBarPropType> = ({
               >
                 <MenuIcon />
               </IconButton>
+              </Stack>
             </Toolbar>
           </AppBar>
           <Drawer

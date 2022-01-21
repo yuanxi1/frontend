@@ -17,17 +17,20 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import Fab from "@mui/material/Fab";
 
-import TaskToolBar from "../components/tasks/TaskToolBar";
-import TaskTable from "../components/tasks/TaskTable";
-import SearchTasksField from "../components/tasks/SearchTask";
+import TaskToolBar from "../components/tasks/taskDisplay/TaskToolBar";
+import TaskTable from "../components/tasks/taskDisplay/TaskTable";
+import SearchTasksField from "../components/tasks/taskForm/SearchTask";
 import { fetchAllTags } from "../reducers/tagSlice";
 
 const Home = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [showCompleted, setShowCompleted] = useState(true);
+  const [showSearch, setShowSearch] = useState(false);
+  const [order, setOrder] = useState("active-completed");
 
   const filters = useAppSelector(getSearchFilters);
-  const tasksToDisplay = useAppSelector(getSortedTasks("active-completed"));
+  const tasksToDisplay = useAppSelector(getSortedTasks(order));
 
   useEffect(() => {
     dispatch(fetchTasks(filters));
@@ -38,9 +41,6 @@ const Home = () => {
     dispatch(fetchAllTags());
   }, []);
 
-  const [showCompleted, setShowCompleted] = useState(true);
-
-  const [showSearch, setShowSearch] = useState(false);
   const handleSearchClick = () => {
     if (showSearch) {
       dispatch(resetFilters());
@@ -50,24 +50,24 @@ const Home = () => {
 
   return (
     <div>
-      <Button variant="contained" onClick={() => navigate("/add_task")}>
-        Add a new task
-      </Button>
-
-      {/* <Box sx={{  padding: 5, bgcolor: "#F5F5F5" }}> */}
-      <Grid container spacing={3}>
-        <Grid item lg={11} md={11} sm={12} xs={12}>
-          <SearchTasksField showSearch={showSearch} />
-        </Grid>
-
-        <Grid item lg={1} md={1} sm={12} xs={12} sx={{ margin: "auto" }}>
-          <Fab color="primary" aria-label="search" onClick={handleSearchClick}>
+      <Grid container spacing={1} justifyContent={'right'}>
+        <Grid item lg={1} md={1} sm={1} xs={1} >
+          <Fab color="primary" aria-label="search" onClick={handleSearchClick} >
             {showSearch ? <CloseIcon /> : <SearchIcon />}
           </Fab>
         </Grid>
 
         <Grid item lg={12} md={12} sm={12} xs={12}>
-          <TaskToolBar setShowCompleted={setShowCompleted}/>
+          <SearchTasksField showSearch={showSearch} />
+        </Grid>
+
+        <Grid item lg={12} md={12} sm={12} xs={12}>
+          <TaskToolBar
+            order={order}
+            setOrder={setOrder}
+            setShowCompleted={setShowCompleted}
+            tasksNumber={tasksToDisplay.length}
+          />
           <Paper
             sx={{
               width: "90%",
@@ -85,7 +85,6 @@ const Home = () => {
           </Paper>
         </Grid>
       </Grid>
-      {/* </Box> */}
     </div>
   );
 };

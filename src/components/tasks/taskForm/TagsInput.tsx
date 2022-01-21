@@ -1,6 +1,6 @@
 import Autocomplete from '@mui/material/Autocomplete';
 import Chip from '@mui/material/Chip';
-import { useAppSelector } from "../../app/hooks";
+import { useAppSelector } from "../../../app/hooks";
 import TextField from '@mui/material/TextField';
 
 interface TagInputPropType{

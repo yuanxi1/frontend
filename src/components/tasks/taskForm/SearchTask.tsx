@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useAppSelector, useAppDispatch } from "../../app/hooks";
+import { useAppSelector, useAppDispatch } from "../../../app/hooks";
 import {
   updateTitleFilter,
   updateTagFilter,
   updateDueFromFilter,
   updateDueToFilter,
-} from "../../reducers/searchSlice";
+} from "../../../reducers/searchSlice";
 import Button from "@mui/material/Button";
 import { FormControl, InputLabel, OutlinedInput } from "@mui/material";
 import TextField from "@mui/material/TextField";

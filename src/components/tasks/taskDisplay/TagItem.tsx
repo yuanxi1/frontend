@@ -6,7 +6,7 @@ interface TagItemProps {
 const TagItem: React.FC<TagItemProps> = ({tag}) => {
     
     return (
-    <Chip label={tag} color='success'/> 
+    <Chip label={tag} sx={{ m: '1px', bgcolor: '#B39DDB'}}/> 
     )
 }
 export default TagItem;

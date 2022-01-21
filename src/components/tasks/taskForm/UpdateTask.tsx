@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import TextField from '@mui/material/TextField';
 import DatePicker from '@mui/lab/DatePicker';
 import { Paper, Button } from "@mui/material";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { updateTask } from "../../reducers/taskSlice";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { updateTask } from "../../../reducers/taskSlice";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import TagInput from "./TagsInput";
 import parseISO from 'date-fns/parseISO'
 import format from 'date-fns/format'
-import AlertBar from "../alertBar";
-import { clearTaskErrorMessage } from "../../reducers/taskSlice";
+import AlertBar from "../../alertBar";
+
 
 
 const EditTaskForm = () => {
@@ -60,16 +60,16 @@ const EditTaskForm = () => {
             padding: 2
             
     }}>
-      {errorMessage && <AlertBar message={errorMessage} severity="error" clearMessage={clearTaskErrorMessage}/> }
+      
       <Button variant="outlined" color='secondary' onClick={() => navigate('/home')}>Go Back to Home Page</Button>
       <TextField 
-          id="outlined-basic" 
+          id="title" 
           label="Title" 
           variant="outlined"
           value={title} 
           onChange={e => setTitle(e.target.value)} />
       <TextField
-          id="outlined-multiline-flexible"
+          id="description"
           label="Description"
           multiline
           value={description}
@@ -85,7 +85,7 @@ const EditTaskForm = () => {
             if(newValue){
               setDuedate(newValue);}
           }}
-          renderInput={(params) => <TextField {...params} />}
+          renderInput={(params) => <TextField disabled {...params} />}
         />
     
          <Button variant="contained" onClick={handleSubmit}>Update</Button>

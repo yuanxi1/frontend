@@ -10,6 +10,7 @@ import { RootState } from "../app/store";
 import { logOut } from "./userSlice";
 import { SearchFilter } from "./searchSlice";
 import format from 'date-fns/format'
+import { setErrorAlert } from "./alertSlice";
 
 
 const API_URL = "http://localhost:8000/api/v1/";
@@ -50,7 +51,7 @@ const initialState: taskState = {
   error: "",         //stores any error message to display
   success: ""        // stores any success message to display
 };
-
+///////////////============= Thunks =============////////////////
 export const fetchTasks = createAsyncThunk(
   "task/fetchTasks",
   async (filters: SearchFilter, { rejectWithValue, dispatch }) => {  
@@ -69,7 +70,8 @@ export const fetchTasks = createAsyncThunk(
         if(error.response.status === 401){
           dispatch(logOut())
         }
-        return rejectWithValue(error.response.data.error);
+        dispatch(setErrorAlert(error.response.data.error))
+        return rejectWithValue(error);
       });
   }
 );
@@ -83,7 +85,8 @@ export const addTask = createAsyncThunk(
         if(error.response.status === 401){
           dispatch(logOut())
         }
-        return rejectWithValue(error.response.data.error);
+        dispatch(setErrorAlert(error.response.data.error))
+        return rejectWithValue(error);
       });
   }
 );
@@ -97,23 +100,28 @@ export const deleteTask = createAsyncThunk(
         if(error.response.status === 401){
           dispatch(logOut())
         }
-        return rejectWithValue(error.response.data.error);
+        dispatch(setErrorAlert(error.response.data.error))
+        return rejectWithValue(error);
       });
   }
 );
 
 export const updateTask = createAsyncThunk(
   "task/updateTask",
-  async (data: {task:{taskId: string|number}}, { rejectWithValue }) => {
+  async (data: {task:{taskId: string|number}}, { rejectWithValue, dispatch }) => {
     return axios
       .patch(API_URL + `tasks/${data.task.taskId}`, data, { headers: authHeader() })
       .then((response) => response.data)
       .catch((error) => {
-        return rejectWithValue(error.response.data.error);
+        if(error.response.status === 401){
+          dispatch(logOut())
+        }
+        dispatch(setErrorAlert(error.response.data.error))
+        return rejectWithValue(error);
       });
   }
 );
-
+///////////////============= Reducers =============////////////////
 const taskSlice = createSlice({
   name: "task",
   initialState,
@@ -121,24 +129,9 @@ const taskSlice = createSlice({
     taskAdded(state, action) {
       state.success = 'added'
     },
-    // taskUpdated(state, action) {
-      // const { id, title, description, tag_list, completed } = action.payload.data.attributes;
-      // const existingTask = state.tasks.find((task) => task.id === id);
-
-      // if (existingTask) {
-      //   existingTask.title = title;
-      //   existingTask.description = description;
-      //   existingTask.tag_list = tag_list;
-      //   existingTask.completed = completed;
-
-      // }
-    // },
     clearTaskSuccessMessage(state) {
       state.success = ''
     },
-    clearTaskErrorMessage(state) {
-      state.error=''
-    }
   },
   extraReducers(builder) {
     builder
@@ -153,9 +146,6 @@ const taskSlice = createSlice({
       })
       .addCase(fetchTasks.rejected, (state, action) => {
         state.status = "failed";
-        if (typeof action.payload === "string") {
-          state.error = action.payload;
-        }
       })
       .addCase(deleteTask.fulfilled, (state, action: PayloadAction<{
         id: string;}>) => {
@@ -166,17 +156,11 @@ const taskSlice = createSlice({
         );
       })
       .addCase(deleteTask.rejected, (state, action) => {
-        if (typeof action.payload === "string") {
-          state.error = action.payload;
-        }
       })
       .addCase(addTask.fulfilled, (state) => {
         state.success ='added'
       })
       .addCase(addTask.rejected, (state, action) => {
-        if (typeof action.payload === "string") {
-          state.error = action.payload;
-        }
       })
       .addCase(updateTask.fulfilled, (state, action) => {
         state.success ='updated'
@@ -192,16 +176,14 @@ const taskSlice = createSlice({
         }
       })
       .addCase(updateTask.rejected, (state, action) => {
-        if (typeof action.payload === "string") {
-          state.error = action.payload;
-        }
+
       });
   },
 });
 
 const { reducer, actions } = taskSlice;
 
-export const { taskAdded, clearTaskSuccessMessage, clearTaskErrorMessage } = actions;
+export const { taskAdded, clearTaskSuccessMessage } = actions;
 export default reducer;
 
 ///////////////============= Useful Selectors =============////////////////
@@ -220,6 +202,12 @@ export const getSortedTasks = (filter: string) =>
     } else if (filter === "active-completed") {
       return [...tasks].sort(
         (a, b) => Number(a.completed) - Number(b.completed)
+      );
+    } else if (filter === "new-old") {
+      return [...tasks].sort(
+        (a, b) =>
+          Date.parse(b.duedate) -
+          Date.parse(a.duedate)
       );
     } else {
       return tasks;

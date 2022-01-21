@@ -7,10 +7,10 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 
 import { useDispatch } from "react-redux";
-import { deleteTask } from "../../reducers/taskSlice";
+import { deleteTask } from "../../../reducers/taskSlice";
 import { useNavigate } from "react-router-dom";
-import { Task } from "../../reducers/taskSlice";
-import TagItem from "./TagItem"
+import { Task } from "../../../reducers/taskSlice";
+import TagItem from './TagItem';
 interface TaskItemProps {
     task: Task
 }

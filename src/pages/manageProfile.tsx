@@ -48,7 +48,6 @@ const ProfilePage = () => {
         { headers: authHeader() }
       )
       .then((response) => {
-        // console.log(response.data);
         localStorage.clear();
         dispatch(logOut());
       });
@@ -113,4 +112,3 @@ const ProfilePage = () => {
   );
 };
 export default ProfilePage;
-// export
