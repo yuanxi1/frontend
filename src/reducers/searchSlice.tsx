@@ -4,12 +4,9 @@ import {
     createAsyncThunk,
     createSelector,
   } from "@reduxjs/toolkit/";
-import axios from "axios";
-import authHeader from "../api/auth-header";
 import { RootState } from "../app/store";
 import format from 'date-fns/format'
 
-const API_URL = "http://localhost:8000/api/v1/";
 const today = format(new Date(), 'yyyy-MM-dd')
 
 export interface SearchFilter {
@@ -22,7 +19,7 @@ export interface SearchFilter {
      title: '', 
      tag: '', 
      due_from: today, 
-     due_to: today 
+     due_to: today,
   };
   
   const searchSlice = createSlice({

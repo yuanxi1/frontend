@@ -6,10 +6,7 @@ import {
 } from "../reducers/taskSlice";
 import { resetFilters } from "../reducers/searchSlice";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
-import { useNavigate } from "react-router-dom";
 
-import Button from "@mui/material/Button";
-import { Typography } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import { styled } from "@mui/material/styles";
@@ -24,7 +21,6 @@ import { fetchAllTags } from "../reducers/tagSlice";
 
 const Home = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const [showCompleted, setShowCompleted] = useState(true);
   const [showSearch, setShowSearch] = useState(false);
   const [order, setOrder] = useState("active-completed");
@@ -39,7 +35,7 @@ const Home = () => {
   useEffect(() => {
     dispatch(resetFilters());
     dispatch(fetchAllTags());
-  }, []);
+  }, [dispatch]);
 
   const handleSearchClick = () => {
     if (showSearch) {

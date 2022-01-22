@@ -3,22 +3,20 @@ import TextField from "@mui/material/TextField";
 import DatePicker from "@mui/lab/DatePicker";
 import { Paper, Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { updateTask } from "../../../reducers/taskSlice";
+import { selectTaskById, updateTask } from "../../../reducers/taskSlice";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import TagInput from "./TagsInput";
 import parseISO from "date-fns/parseISO";
 import format from "date-fns/format";
-import { Task } from "../../../types/interface";
 
 const EditTaskForm = () => {
   const { taskId } = useParams();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const task = useAppSelector((state) =>
-    state.task.tasks.find((task) => task.id.toString() === taskId)
-  );
+  const task = useAppSelector(selectTaskById(parseInt(taskId? taskId : '')))
+
   const tag_list = task ? task.tag_list.map((tag) => tag.name) : [];
   const [title, setTitle] = useState(task?.title);
   const [description, setDescription] = useState(task?.description);
@@ -32,7 +30,7 @@ const EditTaskForm = () => {
     if (successMessage === "Task updated") {
       navigate(-1);
     }
-  }, [successMessage]);
+  }, [successMessage, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

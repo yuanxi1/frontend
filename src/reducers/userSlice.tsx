@@ -6,8 +6,8 @@ import {
 import axios from "axios";
 import authHeader from "../api/auth-header";
 import { setErrorAlert, setSuccessAlert } from "./alertSlice";
+import { API_URL } from "../api/api_url";
 
-const API_URL = "http://localhost:8000/api/v1/";
 const get_bg_preference = () => {
   const user = localStorage.getItem("user")
   if(user){
@@ -103,7 +103,7 @@ export const updatePreference = createAsyncThunk(
     return axios
       .patch(API_URL + `preference/${data.user.userId}`, data, { headers: authHeader() })
       .then((response) => {
-          const res = response.data.data.attribute
+          const res = response.data.data.attributes
           dispatch(setBg_Preference(res.bg_preference));
           localStorage.setItem('user', JSON.stringify(res))
         })
@@ -146,10 +146,6 @@ const loginSlice = createSlice({
         state.isLoading = false;
         state.loggedIn = false;
       })
-      .addCase(Register.fulfilled, (state, action) => {
-      })
-      .addCase(Register.rejected, (state, action) => {
-      });
   },
 });
 

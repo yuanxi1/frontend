@@ -19,10 +19,18 @@ import { NavBar } from "./components/navBar";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import { styled, useTheme } from "@mui/material";
-
+import { styled } from "@mui/material";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { loginDataType } from "./components/login/login";
 
+const theme = createTheme({
+  typography: {
+    allVariants: {
+      fontFamily: 'BlinkMacSystemFont',
+      textTransform: 'none',
+    },
+  },
+});
 const Main = styled("div")(({ theme }) => ({
   flexGrow: 1,
   margin: theme.spacing(1),
@@ -31,6 +39,7 @@ const Main = styled("div")(({ theme }) => ({
 const NavBarHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
+
 function App() {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
@@ -48,6 +57,7 @@ function App() {
   };
 
   return (
+    <ThemeProvider theme={theme}>
     <div
       style={{
         backgroundImage: `url('${process.env.PUBLIC_URL}/${bg_preference}.jpg')`,
@@ -112,6 +122,7 @@ function App() {
         </BrowserRouter>
       </LocalizationProvider>
     </div>
+    </ThemeProvider>
   );
 }
 export default App;

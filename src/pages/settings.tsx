@@ -55,7 +55,7 @@ const Settings = () => {
               }}
             >
               <img
-                src={require(`../images/${num}.jpg`)}
+                src={`/${num}.jpg`}
                 alt={`${num}`}
                 loading="lazy"
               />

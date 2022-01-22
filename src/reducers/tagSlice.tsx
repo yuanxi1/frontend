@@ -9,8 +9,7 @@ import { RootState } from "../app/store";
 import { SearchFilter } from "./searchSlice";
 import { setErrorAlert } from "./alertSlice";
 import { logOut } from "./userSlice";
-  
-const API_URL = "http://localhost:8000/api/v1/";
+import { API_URL } from "../api/api_url";
 
 export interface Tag {
   id: number;

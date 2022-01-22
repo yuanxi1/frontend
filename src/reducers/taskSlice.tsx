@@ -9,48 +9,37 @@ import authHeader from "../api/auth-header";
 import { RootState } from "../app/store";
 import { logOut } from "./userSlice";
 import { SearchFilter } from "./searchSlice";
-import format from 'date-fns/format'
+import format from "date-fns/format";
 import { setErrorAlert, setSuccessAlert } from "./alertSlice";
+import { Task } from "../types/interface";
+import { API_URL } from "../api/api_url";
 
-const API_URL = "http://localhost:8000/api/v1/";
-
-export interface Tag {
-  id: number;
-  name: string;
-}
-
-export interface Task {
-  id: number;
-  title: string;
-  description: string;
-  tag_list: Tag[];
-  completed: boolean;
-  duedate: string;
-}
 interface taskState {
   tasks: Task[];
   status: "idle" | "loading" | "succeeded" | "failed";
 }
 interface addTaskFormData {
   task: {
-    title: string,
-    description?: string,
-    completed: boolean,
-    duedate: string,
-    tag_list: string[]
+    title: string;
+    description?: string;
+    completed: boolean;
+    duedate: string;
+    tag_list: string[];
+  };
 }
-}
-
 
 const initialState: taskState = {
-  tasks: [],         //stores all the tasks to display
-  status: "idle",    //shows the fetch task status
+  tasks: [], //stores all the tasks to display
+  status: "idle", //shows the fetch task status
 };
 ///////////////============= Thunks =============////////////////
 export const fetchTasks = createAsyncThunk(
   "task/fetchTasks",
-  async (filters: SearchFilter, { rejectWithValue, dispatch }) => {  
-    const show_overdue = format(new Date(), 'yyyy-MM-dd') === filters.due_from  && filters.due_from === filters.due_to
+  async (filters: SearchFilter, { rejectWithValue, dispatch }) => {
+    //if fetching today's tasks, fetch the overdue ones as well
+    const show_overdue =
+      format(new Date(), "yyyy-MM-dd") === filters.due_from &&
+      filters.due_from === filters.due_to;
     return axios
       .get(
         API_URL +
@@ -61,10 +50,10 @@ export const fetchTasks = createAsyncThunk(
         return response.data;
       })
       .catch((error) => {
-        if(error.response.status === 401){
-          dispatch(logOut())
+        if (error.response.status === 401) {
+          dispatch(logOut());
         }
-        dispatch(setErrorAlert(error.response.data.error))
+        dispatch(setErrorAlert(error.response.data.error));
         return rejectWithValue(error);
       });
   }
@@ -75,13 +64,14 @@ export const addTask = createAsyncThunk(
     return axios
       .post(API_URL + `tasks/`, data, { headers: authHeader() })
       .then((response) => {
-        dispatch(setSuccessAlert('Task added'))
-        return response.data})
+        dispatch(setSuccessAlert("Task added"));
+        return response.data;
+      })
       .catch((error) => {
-        if(error.response.status === 401){
-          dispatch(logOut())
+        if (error.response.status === 401) {
+          dispatch(logOut());
         }
-        dispatch(setErrorAlert(error.response.data.error))
+        dispatch(setErrorAlert(error.response.data.error));
         return rejectWithValue(error);
       });
   }
@@ -92,13 +82,14 @@ export const deleteTask = createAsyncThunk(
     return axios
       .delete(API_URL + `tasks/${taskId}`, { headers: authHeader() })
       .then((response) => {
-        dispatch(setSuccessAlert('Task deleted'))
-        return response.data})
+        dispatch(setSuccessAlert("Task deleted"));
+        return response.data;
+      })
       .catch((error) => {
-        if(error.response.status === 401){
-          dispatch(logOut())
+        if (error.response.status === 401) {
+          dispatch(logOut());
         }
-        dispatch(setErrorAlert(error.response.data.error))
+        dispatch(setErrorAlert(error.response.data.error));
         return rejectWithValue(error);
       });
   }
@@ -106,17 +97,23 @@ export const deleteTask = createAsyncThunk(
 
 export const updateTask = createAsyncThunk(
   "task/updateTask",
-  async (data: {task:{taskId: string|number}}, { rejectWithValue, dispatch }) => {
+  async (
+    data: { task: { taskId: string | number } },
+    { rejectWithValue, dispatch }
+  ) => {
     return axios
-      .patch(API_URL + `tasks/${data.task.taskId}`, data, { headers: authHeader() })
+      .patch(API_URL + `tasks/${data.task.taskId}`, data, {
+        headers: authHeader(),
+      })
       .then((response) => {
-        dispatch(setSuccessAlert('Task updated'))
-        return response.data})
+        dispatch(setSuccessAlert("Task updated"));
+        return response.data;
+      })
       .catch((error) => {
-        if(error.response.status === 401){
-          dispatch(logOut())
+        if (error.response.status === 401) {
+          dispatch(logOut());
         }
-        dispatch(setErrorAlert(error.response.data.error))
+        dispatch(setErrorAlert(error.response.data.error));
         return rejectWithValue(error);
       });
   }
@@ -128,7 +125,7 @@ const taskSlice = createSlice({
   reducers: {},
   extraReducers(builder) {
     builder
-      .addCase(fetchTasks.pending, (state, action) => {
+      .addCase(fetchTasks.pending, (state, _action) => {
         state.status = "loading";
       })
       .addCase(fetchTasks.fulfilled, (state, action) => {
@@ -137,26 +134,24 @@ const taskSlice = createSlice({
           (task: { attributes: any }) => task.attributes
         );
       })
-      .addCase(fetchTasks.rejected, (state, action) => {
+      .addCase(fetchTasks.rejected, (state, _action) => {
         state.status = "failed";
       })
-      .addCase(deleteTask.fulfilled, (state, action: PayloadAction<{
-        id: string;}>) => {
-        
-        const id = parseInt(action.payload.id)
-        state.tasks = state.tasks.filter(
-          (task) => task.id !== id
-        );
-      })
-      .addCase(deleteTask.rejected, (state, action) => {
-      })
-      .addCase(addTask.fulfilled, (state) => {
- 
-      })
-      .addCase(addTask.rejected, (state, action) => {
-      })
+      .addCase(
+        deleteTask.fulfilled,
+        (
+          state,
+          action: PayloadAction<{
+            id: string;
+          }>
+        ) => {
+          const id = parseInt(action.payload.id);
+          state.tasks = state.tasks.filter((task) => task.id !== id);
+        }
+      )
       .addCase(updateTask.fulfilled, (state, action) => {
-        const { id, title, description, tag_list, duedate, completed } = action.payload.data.attributes;
+        const { id, title, description, tag_list, duedate, completed } =
+          action.payload.data.attributes;
         const existingTask = state.tasks.find((task) => task.id === id);
         if (existingTask) {
           existingTask.title = title;
@@ -166,9 +161,6 @@ const taskSlice = createSlice({
           existingTask.completed = completed;
         }
       })
-      .addCase(updateTask.rejected, (state, action) => {
-
-      });
   },
 });
 
@@ -180,7 +172,7 @@ export default reducer;
 ///////////////============= Useful Selectors =============////////////////
 
 export const selectAllTasks = (state: RootState) => state.task.tasks;
-export const selectTaskById = (state: RootState, taskId: number) =>
+export const selectTaskById = (taskId: number) => (state: RootState) =>
   state.task.tasks.find((task) => task.id === taskId);
 export const getSearchFilters = (state: RootState) => state.search;
 
@@ -196,29 +188,16 @@ export const getSortedTasks = (filter: string) =>
       );
     } else if (filter === "new-old") {
       return [...tasks].sort(
-        (a, b) =>
-          Date.parse(b.duedate) -
-          Date.parse(a.duedate)
+        (a, b) => Date.parse(b.duedate) - Date.parse(a.duedate)
       );
     } else {
       return tasks;
     }
   });
-  
-export const getCompletedTasks = createSelector(
-  selectAllTasks,
-  (tasks) => {
-    return tasks.filter(
-      (task) => task.completed
-    );
-  }
-);
-export const getActiveTasks = createSelector(
-  selectAllTasks,
-  (tasks) => {
-    return tasks.filter(
-      (task) => !task.completed
-    );
-  }
-);
 
+export const getCompletedTasks = createSelector(selectAllTasks, (tasks) => {
+  return tasks.filter((task) => task.completed);
+});
+export const getActiveTasks = createSelector(selectAllTasks, (tasks) => {
+  return tasks.filter((task) => !task.completed);
+});

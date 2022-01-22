@@ -9,8 +9,9 @@ import CardContent from "@mui/material/CardContent";
 import { useDispatch } from "react-redux";
 import { deleteTask } from "../../../reducers/taskSlice";
 import { useNavigate } from "react-router-dom";
-import { Task } from "../../../reducers/taskSlice";
+import { Task } from '../../../types/interface';
 import TagItem from './TagItem';
+import {format, parseISO} from "date-fns"
 interface TaskItemProps {
     task: Task
 }
@@ -35,7 +36,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task }) =>{
                 <Typography>
                 {task.description}
                 </Typography>
-                {!!task.duedate && <Typography>Due date: {task.duedate}</Typography>}
+                <Typography variant="caption">Due on: {format(parseISO(task.duedate), 'EEEE MMMM d')}</Typography>
              
           </CardContent>
           <CardActions>

@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import { updateDueToFilter, updateDueFromFilter } from "../reducers/searchSlice";
+import {
+  fetchTasks,
+  getSearchFilters,
+  selectAllTasks
+} from "../reducers/taskSlice";
+import TaskItem from "../components/tasks/taskDisplay/TaskItem";
+import { Task } from "../types/interface";
+
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar'
 import {startOfMonth, endOfMonth, startOfWeek, endOfWeek} from 'date-fns'
 import format from 'date-fns/format'
@@ -10,13 +18,6 @@ import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import Backdrop from "@mui/material/Backdrop";
-import {
-    fetchTasks,
-    getSearchFilters,
-    selectAllTasks,
-    Task,
-  } from "../reducers/taskSlice";
-import TaskItem from "../components/tasks/taskDisplay/TaskItem";
 import { alpha } from "@mui/material";
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
@@ -39,18 +40,18 @@ const CalendarPage = () => {
   const filters = useAppSelector(getSearchFilters);
   const today = new Date();
   const yesterday = subDays(today, 1);
+  const start = format(startOfWeek(startOfMonth(today)), 'yyyy-MM-dd')
+  const end = format(endOfWeek(endOfMonth(today)), 'yyyy-MM-dd')
   const [open, setOpen] = useState(false);
   const [taskToDisplay, setTaskToDisplay] = useState<Task | null>(null);
   useEffect(() => {
-    const start = format(startOfWeek(startOfMonth(today)), 'yyyy-MM-dd')
-    const end = format(endOfWeek(endOfMonth(today)), 'yyyy-MM-dd')
     dispatch(updateDueFromFilter(start))
     dispatch(updateDueToFilter(end))
-  }, [])
+  }, [dispatch, start, end])
 
   useEffect(() => {
     dispatch(fetchTasks(filters));
-  }, [filters]);
+  }, [dispatch, filters]);
 
 
   const handleCloseBackdrop = () => {
