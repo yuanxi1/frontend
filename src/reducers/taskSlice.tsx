@@ -10,8 +10,7 @@ import { RootState } from "../app/store";
 import { logOut } from "./userSlice";
 import { SearchFilter } from "./searchSlice";
 import format from 'date-fns/format'
-import { setErrorAlert } from "./alertSlice";
-
+import { setErrorAlert, setSuccessAlert } from "./alertSlice";
 
 const API_URL = "http://localhost:8000/api/v1/";
 
@@ -31,8 +30,6 @@ export interface Task {
 interface taskState {
   tasks: Task[];
   status: "idle" | "loading" | "succeeded" | "failed";
-  error: string ;
-  success: "" | "added" | "deleted" | "updated";
 }
 interface addTaskFormData {
   task: {
@@ -48,8 +45,6 @@ interface addTaskFormData {
 const initialState: taskState = {
   tasks: [],         //stores all the tasks to display
   status: "idle",    //shows the fetch task status
-  error: "",         //stores any error message to display
-  success: ""        // stores any success message to display
 };
 ///////////////============= Thunks =============////////////////
 export const fetchTasks = createAsyncThunk(
@@ -63,7 +58,6 @@ export const fetchTasks = createAsyncThunk(
         { headers: authHeader() }
       )
       .then((response) => {
-        console.log(response.data);
         return response.data;
       })
       .catch((error) => {
@@ -80,7 +74,9 @@ export const addTask = createAsyncThunk(
   async (data: addTaskFormData, { rejectWithValue, dispatch }) => {
     return axios
       .post(API_URL + `tasks/`, data, { headers: authHeader() })
-      .then((response) => response.data)
+      .then((response) => {
+        dispatch(setSuccessAlert('Task added'))
+        return response.data})
       .catch((error) => {
         if(error.response.status === 401){
           dispatch(logOut())
@@ -95,7 +91,9 @@ export const deleteTask = createAsyncThunk(
   async (taskId: Number, { rejectWithValue, dispatch }: any) => {
     return axios
       .delete(API_URL + `tasks/${taskId}`, { headers: authHeader() })
-      .then((response) => response.data)
+      .then((response) => {
+        dispatch(setSuccessAlert('Task deleted'))
+        return response.data})
       .catch((error) => {
         if(error.response.status === 401){
           dispatch(logOut())
@@ -111,7 +109,9 @@ export const updateTask = createAsyncThunk(
   async (data: {task:{taskId: string|number}}, { rejectWithValue, dispatch }) => {
     return axios
       .patch(API_URL + `tasks/${data.task.taskId}`, data, { headers: authHeader() })
-      .then((response) => response.data)
+      .then((response) => {
+        dispatch(setSuccessAlert('Task updated'))
+        return response.data})
       .catch((error) => {
         if(error.response.status === 401){
           dispatch(logOut())
@@ -125,14 +125,7 @@ export const updateTask = createAsyncThunk(
 const taskSlice = createSlice({
   name: "task",
   initialState,
-  reducers: {
-    taskAdded(state, action) {
-      state.success = 'added'
-    },
-    clearTaskSuccessMessage(state) {
-      state.success = ''
-    },
-  },
+  reducers: {},
   extraReducers(builder) {
     builder
       .addCase(fetchTasks.pending, (state, action) => {
@@ -149,7 +142,7 @@ const taskSlice = createSlice({
       })
       .addCase(deleteTask.fulfilled, (state, action: PayloadAction<{
         id: string;}>) => {
-        state.success = 'deleted'
+        
         const id = parseInt(action.payload.id)
         state.tasks = state.tasks.filter(
           (task) => task.id !== id
@@ -158,21 +151,19 @@ const taskSlice = createSlice({
       .addCase(deleteTask.rejected, (state, action) => {
       })
       .addCase(addTask.fulfilled, (state) => {
-        state.success ='added'
+ 
       })
       .addCase(addTask.rejected, (state, action) => {
       })
       .addCase(updateTask.fulfilled, (state, action) => {
-        state.success ='updated'
-        const { id, title, description, tag_list, completed } = action.payload.data.attributes;
+        const { id, title, description, tag_list, duedate, completed } = action.payload.data.attributes;
         const existingTask = state.tasks.find((task) => task.id === id);
-  
         if (existingTask) {
           existingTask.title = title;
           existingTask.description = description;
           existingTask.tag_list = tag_list;
+          existingTask.duedate = duedate;
           existingTask.completed = completed;
-  
         }
       })
       .addCase(updateTask.rejected, (state, action) => {
@@ -183,7 +174,7 @@ const taskSlice = createSlice({
 
 const { reducer, actions } = taskSlice;
 
-export const { taskAdded, clearTaskSuccessMessage } = actions;
+// export const { taskAdded, clearTaskSuccessMessage } = actions;
 export default reducer;
 
 ///////////////============= Useful Selectors =============////////////////

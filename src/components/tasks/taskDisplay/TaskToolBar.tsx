@@ -177,7 +177,6 @@ const TaskToolBar: React.FC<{
           value={today}
           onChange={(newValue) => {
             const date = newValue ? format(newValue, "yyyy-MM-dd") : "";
-            const displaydate = newValue ? format(newValue, 'EEEE MMM d') : "";
             dispatch(updateDueFromFilter(date));
             dispatch(updateDueToFilter(date));
           }}

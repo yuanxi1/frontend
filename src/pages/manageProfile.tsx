@@ -7,7 +7,7 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import { logOut } from "../reducers/userSlice";
+import { logOut, resetPassword } from "../reducers/userSlice";
 
 const ProfilePage = () => {
   const dispatch = useAppDispatch();
@@ -33,24 +33,18 @@ const ProfilePage = () => {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const user = localStorage.getItem("user");
-    const userId = user ? JSON.parse(user).user.data.id : "";
+    const userId = user ? JSON.parse(user).id : "";
     if (validate()) {
-    axios
-      .patch(
-        `http://localhost:8000/api/v1/resetpw/${userId}`,
-        {
-          user: {
-            old_password: oldPassword,
-            password: newPassword,
-            password_confirmation: confirmPassword,
-          },
+      const data = {
+        user: {
+          old_password: oldPassword,
+          password: newPassword,
+          password_confirmation: confirmPassword,
+          userId: userId
         },
-        { headers: authHeader() }
-      )
-      .then((response) => {
-        localStorage.clear();
-        dispatch(logOut());
-      });
+        // userId: userId
+      }
+      dispatch(resetPassword(data))
     }
   };
 

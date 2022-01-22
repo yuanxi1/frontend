@@ -1,11 +1,9 @@
 import { useAppDispatch } from "../app/hooks";
-import authHeader from "../api/auth-header";
-import axios from "axios";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import ImageListItem from "@mui/material/ImageListItem";
-import { setBg_Preference } from "../reducers/userSlice";
+import { updatePreference } from "../reducers/userSlice";
 
 const Settings = () => {
   const dispatch = useAppDispatch();
@@ -14,26 +12,13 @@ const Settings = () => {
     e.preventDefault();
     const user = localStorage.getItem("user");
     const userId = user ? JSON.parse(user).id : "";
-
-    axios
-      .patch(
-        `http://localhost:8000/api/v1/preference/${userId}`,
-        {
-          user: {
-            bg_preference: number,
-          },
-        },
-        { headers: authHeader() }
-      )
-      .then((response) => {
-        const res = response.data.data.attributes
-        dispatch(setBg_Preference(res.bg_preference));
-        localStorage.setItem('user', JSON.stringify(res))
-        
-      })
-      .catch((err) => {
-        console.log(err.response.data);
-      });
+    const data = {
+      user: {
+        bg_preference: number,
+        userId: userId
+      }
+    }
+    dispatch(updatePreference(data))
   };
   return (
     <Paper sx={{ padding: 3, borderRadius: 5, width: "80%", margin: "auto" }}>

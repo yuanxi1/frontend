@@ -5,10 +5,12 @@ import {
 
 interface alertState {  
     error: string;
+    success: string;
   }
   
   const initialState: alertState = {
     error: "",
+    success: "",
   };
 
 const loginSlice = createSlice({
@@ -21,10 +23,16 @@ reducers: {
     setErrorAlert: (state, action: PayloadAction<string>) => {
         state.error = action.payload
     },
+    clearSuccessAlert: (state) => {
+      state.success = "";
+    },
+    setSuccessAlert: (state, action: PayloadAction<string>) => {
+        state.success = action.payload
+    },
 }
 });
 
 const { reducer, actions } = loginSlice;
 
-export const { clearErrorAlert, setErrorAlert } = actions;
+export const { clearErrorAlert, setErrorAlert, clearSuccessAlert, setSuccessAlert } = actions;
 export default reducer;

@@ -15,13 +15,13 @@ const AddTaskForm = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [duedate, setDuedate] = useState<Date>(new Date());
   const [error, setError] = useState<string>('')
-  const successMessage = useAppSelector(state=> state.task.success)
+  const successMessage = useAppSelector(state=> state.alert.success)
   
   
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   useEffect(() => {
-    if(successMessage ==='added'){
+    if(successMessage ==='Task added'){
     navigate('/home')}
   }, [successMessage])
 

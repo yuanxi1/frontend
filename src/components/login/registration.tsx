@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { Link, useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
@@ -31,12 +31,13 @@ const Registration = () => {
     return Object.values(temp).every((x) => x === "");
   };
 
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  // useEffect(() => {
-  //   if(successMessage ==='account created!'){
-  //   navigate('/login')}
-  // }, [successMessage])
+  const successMessage = useAppSelector(state => state.alert.success)
+  useEffect(() => {
+    if(successMessage ==='Registed'){
+    navigate('/login')}
+  }, [successMessage])
 
   const handleSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();

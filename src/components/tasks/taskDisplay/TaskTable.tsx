@@ -2,11 +2,7 @@ import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import TaskItem from "./TaskItem";
 import TagItem from "./TagItem";
-import {
-  clearTaskSuccessMessage,
-  deleteTask,
-  updateTask,
-} from "../../../reducers/taskSlice";
+import { deleteTask, updateTask } from "../../../reducers/taskSlice";
 import { useNavigate } from "react-router-dom";
 import { Task } from "../../../types/interface";
 
@@ -23,9 +19,9 @@ import {
   Typography,
 } from "@mui/material";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
-import AlertBar from "../../alertBar";
 import { parseISO } from "date-fns";
 import { subDays } from 'date-fns';
+import EditTaskForm from "../taskForm/UpdateTask";
 
 const headCells = [
   { id: "title", label: "Title" },
@@ -44,7 +40,7 @@ const TaskTable: React.FC<{
   const yesterday = subDays(new Date(), 1);
 
   const { TblContainer, TblHead } = useTable(headCells);
-  const successMessage = useAppSelector((state) => state.task.success);
+  
   const handleDeleteTask = (taskId: number) => {
     dispatch(deleteTask(taskId));
   };
@@ -91,15 +87,8 @@ const TaskTable: React.FC<{
       >
         {open && <TaskItem task={tasksToDisplay[taskIndex]} />}
       </Backdrop>
-      {successMessage && (
-        <AlertBar
-          message={"Task " + successMessage + " successfully!"}
-          severity="success"
-          clearMessage={clearTaskSuccessMessage}
-        />
-      )}
 
-      {/* display tasks in a table */}
+    {/* display tasks in a table */}
       <TblContainer>
         <TblHead />
         <TableBody>
@@ -110,7 +99,7 @@ const TaskTable: React.FC<{
                   key={task.id}
                   sx={{
                     "&:hover": { backgroundColor: "#fff8db" },
-                    backgroundColor: task.completed ? "#EEEEEE" : "white",
+                    backgroundColor: task.completed ? "#EEEEEE" : "white", //diff bg between active and completed tasks
                   }}
                 >
                   <TableCell
@@ -120,7 +109,7 @@ const TaskTable: React.FC<{
                     <Typography
                       sx={{
                         color:
-                          task.completed || parseISO(task.duedate) > yesterday ? "black" : "#C62828",
+                          task.completed || parseISO(task.duedate) > yesterday ? "black" : "#C62828", //red color for overdue tasks
                       }}
                     >
                       {task.title}
@@ -138,8 +127,8 @@ const TaskTable: React.FC<{
                     </IconButton>
                     <IconButton
                       color="primary"
-                      onClick={() => handleEditTask(task.id)}
-                    >
+                      onClick={() => handleEditTask(task.id)} 
+                 >
                       <EditIcon />
                     </IconButton>
 

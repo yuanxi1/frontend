@@ -4,7 +4,8 @@ import {
   createAsyncThunk,
 } from "@reduxjs/toolkit/";
 import axios from "axios";
-import { setErrorAlert } from "./alertSlice";
+import authHeader from "../api/auth-header";
+import { setErrorAlert, setSuccessAlert } from "./alertSlice";
 
 const API_URL = "http://localhost:8000/api/v1/";
 const get_bg_preference = () => {
@@ -26,7 +27,7 @@ const initialState: loginState = {
   loggedIn: !!localStorage.getItem("user"),
   bg_preference: get_bg_preference()
 };
-
+///////////////============= Thunks =============////////////////
 export const logIn = createAsyncThunk(
   "user/login",
   async (
@@ -66,7 +67,9 @@ export const Register = createAsyncThunk(
       return axios
         .post(API_URL + "register", data)
         .then((response) => {
-          console.log("response", response);
+          if (response.status === 201) {
+            dispatch(setSuccessAlert('Registed'))
+          }
         })
         .catch((error) => {
         dispatch(setErrorAlert(error.response.data.error))
@@ -74,7 +77,46 @@ export const Register = createAsyncThunk(
         });
     }
   );
-
+export const resetPassword = createAsyncThunk(
+  "user/resetPassword",
+  async (data: {user:{ userId: string|number }}, { rejectWithValue, dispatch }) => {
+    return axios
+      .patch(API_URL + `resetpw/${data.user.userId}`, data, { headers: authHeader() })
+      .then((response) => {
+        if(response.status === 204){
+          dispatch(setSuccessAlert('Password updated'))
+          localStorage.clear();
+          dispatch(logOut());
+        }})
+      .catch((error) => {
+        if(error.response.status === 401){
+          dispatch(logOut())
+        }
+        dispatch(setErrorAlert(error.response.data.error))
+        return rejectWithValue(error);
+      });
+  }
+);
+export const updatePreference = createAsyncThunk(
+  "user/updatePreference",
+  async (data: {user:{ userId: string|number }}, { rejectWithValue, dispatch }) => {
+    return axios
+      .patch(API_URL + `preference/${data.user.userId}`, data, { headers: authHeader() })
+      .then((response) => {
+          const res = response.data.data.attribute
+          dispatch(setBg_Preference(res.bg_preference));
+          localStorage.setItem('user', JSON.stringify(res))
+        })
+      .catch((error) => {
+        if(error.response.status === 401){
+          dispatch(logOut())
+        }
+        dispatch(setErrorAlert(error.response.data.error))
+        return rejectWithValue(error);
+      });
+  }
+);
+///////////////============= Reducers =============////////////////
 const loginSlice = createSlice({
   name: "user",
   initialState,
@@ -85,17 +127,17 @@ const loginSlice = createSlice({
       
     },
     setBg_Preference: ((state, action: PayloadAction<number>) => {
+      console.log('setting preference')
+      console.log(action.payload)
       state.bg_preference = action.payload
     })
   },
   extraReducers(builder) {
     builder
       .addCase(logIn.pending, (state, action) => {
-        // state.status = "loading";
         state.isLoading = true;
       })
       .addCase(logIn.fulfilled, (state, action: PayloadAction<{bg_preference: number}>) => {
-        // state.status = "succeeded";
         state.isLoading = false;
         state.loggedIn = true;
         state.bg_preference = action.payload.bg_preference
@@ -103,17 +145,10 @@ const loginSlice = createSlice({
       .addCase(logIn.rejected, (state, action) => {
         state.isLoading = false;
         state.loggedIn = false;
-        // if (typeof action.payload === "string") {
-        //   state.error = action.payload;
-        // }
       })
       .addCase(Register.fulfilled, (state, action) => {
-        // state.status = "succeeded";
       })
       .addCase(Register.rejected, (state, action) => {
-        // if (typeof action.payload === "string") {
-        //   state.error = action.payload;
-        // }
       });
   },
 });
