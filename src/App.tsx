@@ -91,6 +91,10 @@ function App() {
 
           <Main>
             <Routes>
+            <Route
+                path={"/"}
+                element={<Login handleLogin={handleLogin} />}
+              />
               <Route
                 path={"/login"}
                 element={<Login handleLogin={handleLogin} />}
