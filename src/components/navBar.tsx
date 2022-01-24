@@ -67,7 +67,7 @@ export const NavBar: React.FC<NavBarPropType> = ({
 
   return (
     <>
-      {showloggedInView ? (
+      
         <Box sx={{ display: "flex" }}>
           <CssBaseline />
           <AppBar
@@ -83,9 +83,9 @@ export const NavBar: React.FC<NavBarPropType> = ({
                 component="div"
                 sx={{ flexGrow: 1 }}
               >
-                TODO
+                SimplyDONE
               </Typography>
-              <Stack direction={'row'} spacing={1}>
+              {showloggedInView && <Stack direction={'row'} spacing={1}>
               <Button variant="contained" onClick={() => navigate("/add_task")}>
                 Add a new task
               </Button>
@@ -113,10 +113,10 @@ export const NavBar: React.FC<NavBarPropType> = ({
               >
                 <MenuIcon />
               </IconButton>
-              </Stack>
+              </Stack>}
             </Toolbar>
           </AppBar>
-          <Drawer
+          {showloggedInView && <Drawer
             sx={{
               width: 210, //drawerWidth,
               flexShrink: 0,
@@ -193,30 +193,8 @@ export const NavBar: React.FC<NavBarPropType> = ({
                 <ListItemText primary={"Settings"} />
               </ListItem>
             </List>
-          </Drawer>
+          </Drawer>}
         </Box>
-      ) : (
-        <Box sx={{ display: "flex" }}>
-          <CssBaseline />
-          <AppBar
-            position="fixed"
-            color="transparent"
-            elevation={2}
-            open={open}
-          >
-            <Toolbar>
-              <Typography
-                variant="h6"
-                noWrap
-                component="div"
-                sx={{ flexGrow: 1 }}
-              >
-                TODO
-              </Typography>
-            </Toolbar>
-          </AppBar>
-        </Box>
-      )}
     </>
   );
 };
