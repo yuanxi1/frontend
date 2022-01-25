@@ -22,7 +22,10 @@ import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
 import SortIcon from '@mui/icons-material/Sort';
-
+/* 
+this component is the tool bar at top of the task table, where users can set 
+simple filters and sorting orders
+*/
 const TaskToolBar: React.FC<{
   order: string
   setOrder: React.Dispatch<React.SetStateAction<string>>
@@ -80,7 +83,7 @@ const TaskToolBar: React.FC<{
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
-        bgcolor: "#EDE7F6",
+        bgcolor: "secondary.light",
         minWidth: "460px",
         width: "90%",
         margin: "auto",

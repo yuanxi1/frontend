@@ -13,9 +13,9 @@ export interface loginDataType {
   JWTToken: string;
   user: {};
 }
-const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
-  props
-) => {
+const Login= () => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { isLoading, loggedIn } = useAppSelector((state) => state.user);
@@ -37,8 +37,7 @@ const Login: React.FC<{ handleLogin: (data: loginDataType) => void }> = (
       navigate("/home");
     }
   }, [loggedIn])
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if(validate()) {

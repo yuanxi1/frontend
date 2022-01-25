@@ -1,10 +1,10 @@
-import {
-    createSlice,
-    PayloadAction,
-    createAsyncThunk,
-    createSelector,
-  } from "@reduxjs/toolkit/";
-import { RootState } from "../app/store";
+/*
+The search state stores the current filters that the users choose, these
+include inputs in the search fields or what users pick in the datepicker.
+New get requests will be sent when filters are updated. The content of the 
+task table depends on the search state 
+*/
+import { createSlice } from "@reduxjs/toolkit/";
 import format from 'date-fns/format'
 
 const today = format(new Date(), 'yyyy-MM-dd')
@@ -54,11 +54,8 @@ export interface SearchFilter {
        
   });
   
-  const { reducer, actions } = searchSlice;
-  
-  export const { resetFilters, clearFilters, updateTitleFilter, updateTagFilter, updateDueFromFilter, updateDueToFilter } = actions;
-  export default reducer;
-  
-  ///////////////============= Useful Selectors =============////////////////
-  
-  export const selectAllTasks = (state: RootState) => state.task.tasks;
+const { reducer, actions } = searchSlice;
+
+export const { resetFilters, clearFilters, updateTitleFilter, updateTagFilter, updateDueFromFilter, updateDueToFilter } = actions;
+export default reducer;
+

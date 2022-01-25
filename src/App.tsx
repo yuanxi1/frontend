@@ -15,22 +15,16 @@ import EditTaskForm from "./components/tasks/taskForm/UpdateTask";
 import AddTaskForm from "./components/tasks/taskForm/AddTask";
 import AlertBar from "./components/alertBar";
 import { NavBar } from "./components/navBar";
+import { loginDataType } from "./components/login/login";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import { styled } from "@mui/material";
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { loginDataType } from "./components/login/login";
+import { ThemeProvider } from '@mui/material/styles';
+import { theme } from './theme'
 
-const theme = createTheme({
-  typography: {
-    allVariants: {
-      fontFamily: 'BlinkMacSystemFont',
-      textTransform: 'none',
-    },
-  },
-});
+
 const Main = styled("div")(({ theme }) => ({
   flexGrow: 1,
   margin: theme.spacing(1),
@@ -47,9 +41,6 @@ function App() {
   const errorMessage = useAppSelector((state) => state.alert.error);
   const successMessage = useAppSelector((state) => state.alert.success);
 
-  const handleLogin = (data: loginDataType) => {
-    localStorage.setItem("user", JSON.stringify(data));
-  };
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
@@ -93,11 +84,11 @@ function App() {
             <Routes>
             <Route
                 path={"/"}
-                element={<Login handleLogin={handleLogin} />}
+                element={<Login />}
               />
               <Route
                 path={"/login"}
-                element={<Login handleLogin={handleLogin} />}
+                element={<Login />}
               />
               <Route path={"/register"} element={<Registration />} />
               <Route path="/home" element={<ProtectedRoute />}>

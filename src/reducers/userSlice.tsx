@@ -8,10 +8,10 @@ import authHeader from "../api/auth-header";
 import { setErrorAlert, setSuccessAlert } from "./alertSlice";
 import { API_URL } from "../api/api_url";
 
+/* Since the state returns to initial state on refresh, some user information
+like background preference are stored in localStorage.  */
 const get_bg_preference = () => {
   const user = localStorage.getItem("user")
-  if(user){
-  console.log(JSON.parse(user).bg_preference);}
   return user 
   ? JSON.parse(user).bg_preference
   : 1;
@@ -134,7 +134,7 @@ const loginSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(logIn.pending, (state, action) => {
+      .addCase(logIn.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(logIn.fulfilled, (state, action: PayloadAction<{bg_preference: number}>) => {
@@ -142,7 +142,7 @@ const loginSlice = createSlice({
         state.loggedIn = true;
         state.bg_preference = action.payload.bg_preference
       })
-      .addCase(logIn.rejected, (state, action) => {
+      .addCase(logIn.rejected, (state) => {
         state.isLoading = false;
         state.loggedIn = false;
       })

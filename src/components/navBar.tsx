@@ -1,3 +1,5 @@
+import { useNavigate, useLocation } from "react-router-dom";
+
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -19,35 +21,29 @@ import HomeIcon from "@mui/icons-material/Home";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { useNavigate, useLocation } from "react-router-dom";
 import { alpha } from "@mui/material/styles";
-import { Stack } from "@mui/material";
+import Stack from "@mui/material/Stack";
 
 interface NavBarPropType {
   handleLogout: () => void;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const drawerWidth = 210;
+
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
 }
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
-})<AppBarProps>(({ theme, open }) => ({
+})<AppBarProps>(({ theme }) => ({
+  backgroundColor: alpha(theme.palette.info.main, 0.9),
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  // ...(open && {
-  //   width: `calc(100% - ${drawerWidth}px)`,
-  //   marginRight: `${drawerWidth}px`,
-  //   transition: theme.transitions.create(["margin", "width"], {
-  //     easing: theme.transitions.easing.easeOut,
-  //     duration: theme.transitions.duration.enteringScreen,
-  //   }),
-  // }),
 }));
+const drawerWidth = 210;
+
 export const NavBar: React.FC<NavBarPropType> = ({
   open,
   setOpen,
@@ -56,7 +52,7 @@ export const NavBar: React.FC<NavBarPropType> = ({
   const navigate = useNavigate();
   const current_path = useLocation().pathname;
   const showloggedInView =
-    current_path !== "/login" && current_path !== "/register";
+  !(current_path === "/" || current_path === "/login" || current_path === "/register");
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -67,12 +63,10 @@ export const NavBar: React.FC<NavBarPropType> = ({
 
   return (
     <>
-      
         <Box sx={{ display: "flex" }}>
           <CssBaseline />
           <AppBar
             position="fixed"
-            sx={{ backgroundColor: alpha("#9E9E9E", 0.9) }}
             elevation={2}
             open={open}
           >
@@ -90,7 +84,7 @@ export const NavBar: React.FC<NavBarPropType> = ({
                 Add a new task
               </Button>
 
-              <Button variant="outlined" color='secondary' onClick={handleLogout}>
+              <Button variant="outlined" color='error' onClick={handleLogout}>
                 Log Out
               </Button>
 
@@ -118,15 +112,14 @@ export const NavBar: React.FC<NavBarPropType> = ({
           </AppBar>
           {showloggedInView && <Drawer
             sx={{
-              width: 210, //drawerWidth,
+              width: drawerWidth, 
               flexShrink: 0,
               "& .MuiDrawer-paper": {
-                width: 210, //drawerWidth,
+                width: drawerWidth, 
                 boxSizing: "border-box",
                 border: 0,
               },
             }}
-            // variant="persistent"
             anchor="right"
             open={open}
             onClose={handleDrawerClose}

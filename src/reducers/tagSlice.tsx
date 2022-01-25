@@ -1,12 +1,10 @@
 import {
     createSlice,
-    PayloadAction,
     createAsyncThunk,
   } from "@reduxjs/toolkit/";
 import axios from "axios";
 import authHeader from "../api/auth-header";
 import { RootState } from "../app/store";
-import { SearchFilter } from "./searchSlice";
 import { setErrorAlert } from "./alertSlice";
 import { logOut } from "./userSlice";
 import { API_URL } from "../api/api_url";

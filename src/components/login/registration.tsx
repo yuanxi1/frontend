@@ -61,7 +61,7 @@ const Registration = () => {
         spacing={2}
         sx={{
           padding: 3,
-          border: "1px solid #B39DDB",
+          border: "1px solid secondary",
           borderRadius: 5,
           margin: "auto",
         }}

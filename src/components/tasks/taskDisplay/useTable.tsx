@@ -1,15 +1,9 @@
 import {
-
   Table,
   TableCell,
   TableHead,
   TableRow,
-
-
 } from "@mui/material";
-import TableContainer from '@mui/material/TableContainer';
-
-
 
 export default function useTable(
   headCells: {
@@ -20,12 +14,10 @@ export default function useTable(
   
 
   const TblContainer = (props: any) => {
-    ///???
     return <Table stickyHeader sx={{ width: '100%', maxWidth:'320'}}>{props.children}</Table>;
   };
 
   const TblHead = () => {
-    ///???
     return (
       <TableHead >
         <TableRow>

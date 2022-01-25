@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from './app/hooks';
+import { useAppSelector } from './app/hooks';
 
 const ProtectedRoute = () => {
     // const dispatch = useAppDispatch()

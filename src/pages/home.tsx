@@ -9,7 +9,6 @@ import { useAppSelector, useAppDispatch } from "../app/hooks";
 
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
-import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import Fab from "@mui/material/Fab";
